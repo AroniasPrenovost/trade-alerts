@@ -2,6 +2,12 @@ require('dotenv').config();
 const axios = require('axios');
 const Mailjet = require('node-mailjet');
 
+// Your CoinMarketCap API key stored in .env file
+const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
+
+// crypto symbols we want to watch
+const AVAX_SYMBOL = 'AVAX';
+
 const mailjet = Mailjet.apiConnect(
     process.env.MAILJET_API_KEY,
     process.env.MAILJET_SECRET_KEY,
@@ -50,26 +56,19 @@ function sendTradeNotification(asset_symbol, price, buy_or_sell) {
 }
 // sendTradeNotification('BTC', '50000', 'buy');
 
-    return;
 
-
-// Your CoinMarketCap API key stored in .env file
-const API_KEY = process.env.COINMARKETCAP_API_KEY;
-const LATEST_API_URL = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest';
 // requires Hobbyist -$29/month: https://coinmarketcap.com/api/pricing/
 // const HISTORICAL_API_URL = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/historical';
-const SYMBOL = 'AVAX';
-
-// Function to fetch AVAX latest data
-async function fetchAvaxLatestData() {
+async function fetchCurrentPriceData(symbol) {
+  const LATEST_PRICE_API_URL = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest';
   try {
-    const response = await axios.get(LATEST_API_URL, {
+    const response = await axios.get(LATEST_PRICE_API_URL, {
       headers: {
-        'X-CMC_PRO_API_KEY': API_KEY,
+        'X-CMC_PRO_API_KEY': COINMARKETCAP_API_KEY,
         'Accept': 'application/json',
       },
       params: {
-        symbol: SYMBOL,
+        symbol: symbol,
       },
     });
 
@@ -129,15 +128,15 @@ async function fetchAvaxLatestData() {
 
     */
 
-    console.log(`AVAX price (USD):`, response.data.data.AVAX.quote.USD.price);
+    console.log(`${symbol} price (USD):`, response.data.data[symbol].quote.USD.price);
     // return SOMETHING?
   } catch (error) {
     console.error('Error fetching latest data:', error);
   }
 }
 
-// Function to fetch AVAX historical data
-// async function fetchAvaxHistoricalData(timePeriod) {
+// Function to fetch crypto historical data
+// async function fetchAvaxHistoricalData(symbol, timePeriod) {
 //   try {
 //     const response = await axios.get(HISTORICAL_API_URL, {
 //       headers: {
@@ -145,7 +144,7 @@ async function fetchAvaxLatestData() {
 //         'Accept': 'application/json',
 //       },
 //       params: {
-//         symbol: SYMBOL,
+//         symbol: symbol,
 //         time_start: new Date(Date.now() - timePeriod).toISOString(),
 //         time_end: new Date().toISOString(),
 //         interval: 'daily',
@@ -159,10 +158,10 @@ async function fetchAvaxLatestData() {
 
 // Fetch AVAX data every 10 minutes
 setInterval(() => {
-  const data = fetchAvaxLatestData();
-  // fetchAvaxHistoricalData(7 * 24 * 60 * 60 * 1000); // Fetch historical data for the last 7 days
+  const data = fetchCurrentPriceData(AVAX_SYMBOL);
+  // fetchAvaxHistoricalData(AVAX_SYMBOL, 7 * 24 * 60 * 60 * 1000); // Fetch historical data for the last 7 days
 }, 10 * 60 * 1000);
 
 // Initial fetch
-fetchAvaxLatestData();
-// fetchAvaxHistoricalData(7 * 24 * 60 * 60 * 1000); // Fetch historical data for the last 7 days
+fetchCurrentPriceData(AVAX_SYMBOL);
+// fetchAvaxHistoricalData(AVAX_SYMBOL, 7 * 24 * 60 * 60 * 1000); // Fetch historical data for the last 7 days
