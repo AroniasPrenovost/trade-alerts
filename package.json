@@ -1,0 +1,16 @@
+{
+  "name": "swing-trader",
+  "version": "1.0.0",
+  "description": "1. how to select stocks for trading - thinkorswim scanner - coinbase mrket report - what other stategy? 2. set levels 3. profit",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "node-mailjet": "^6.0.6"
+  }
+}
