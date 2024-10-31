@@ -6,6 +6,13 @@ const Mailjet = require('node-mailjet');
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
 
 // crypto symbols we want to watch
+const CRYPTO_SYMBOLS = process.env.CRYPTO_SYMBOLS.split(',') ?? [];
+console.log({CRYPTO_SYMBOLS});
+return;
+
+
+
+
 const AVAX_SYMBOL = 'AVAX';
 
 const mailjet = Mailjet.apiConnect(
