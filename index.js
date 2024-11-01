@@ -9,13 +9,13 @@ const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
 const assets_to_watch = [
   {
     symbol: 'BTC',
-    high: 80,
-    low: 55
+    high: 80_000,
+    low: 55_000,
   },
   {
     symbol: 'AVAX',
     high: 29,
-    low: 22
+    low: 22,
 }];
 
 const mailjet = Mailjet.apiConnect(
