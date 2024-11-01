@@ -159,7 +159,7 @@ async function checkAssets() {
 }
 
 // Check every X time frame
-setInterval(checkAssets, 10 * 60 * 1000); // 10 minutes
+setInterval(checkAssets, 60 * 60 * 1000); // 60 minutes
 
 // Initial check
 checkAssets();
