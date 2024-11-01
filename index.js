@@ -166,8 +166,5 @@ async function checkAssetPrices() {
 }
 
 // Check every X time frame (ran via cron job)
-// setInterval(checkAssetPrices, 60 * 60 * 1000); // 60 minutes
-
-// Initial check
 checkAssetPrices();
 console.log(' ');
