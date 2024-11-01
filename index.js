@@ -7,15 +7,20 @@ const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
 
 // crypto symbols we want to watch
 const assets_to_watch = [
-  {
-    symbol: 'BTC',
-    high: 80_000,
-    low: 55_000,
-  },
+  // {
+  //   symbol: 'BTC',
+  //   high: 80_000,
+  //   low: 55_000,
+  // },
   {
     symbol: 'AVAX',
     high: 29,
     low: 22,
+},
+{
+  symbol: 'DOT',
+  high: 10,
+  low: 3,
 }];
 
 const mailjet = Mailjet.apiConnect(
