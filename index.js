@@ -163,7 +163,6 @@ async function checkAssetPrices() {
       }
     }
   }
-  console.log(' ');
 }
 
 // Check every X time frame (ran via cron job)
@@ -171,3 +170,4 @@ async function checkAssetPrices() {
 
 // Initial check
 checkAssetPrices();
+console.log(' ');
