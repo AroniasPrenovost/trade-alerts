@@ -1,55 +1,74 @@
-# Swing Trader
+# Crypto Price Alert System
 
-1. how to select stocks for trading
-- thinkorswim scanner
-- coinbase mrket report
-- what other stategy?
+This project is a Node.js application that monitors cryptocurrency prices using the CoinMarketCap API and sends trade notifications via email using Mailjet. The application checks the current price of specified cryptocurrencies and sends an alert if the price crosses predefined high or low thresholds.
 
+## Features
 
-- need to find a stock that is volatile and high/volume
+- Monitor cryptocurrency prices in real-time.
+- Send email notifications for buy/sell recommendations.
+- Configurable support levels for each cryptocurrency.
+- Uses CoinMarketCap API for price data.
+- Uses Mailjet for sending email notifications.
 
-2. set levels
-3. profit  
+## Prerequisites
 
-###
+- Node.js (v14 or later)
+- npm (Node Package Manager)
+- CoinMarketCap API key
+- Mailjet API key and secret
 
+## Installation
 
+1. Clone the repository:
 
-### Schwab?
+   ```bash
+   git clone https://github.com/AroniasPrenovost/trade-alerts.git
+   cd trade-alerts
+   ```
 
+2. Install dependencies:
 
+   ```bash
+   npm install
+   ```
 
+3. Create a `.env` file in the root directory and configure your environment variables. Use `.env.sample` as a reference:
 
-### Coinbase?
+   ```plaintext
+   MAILJET_API_KEY=your-mailjet-api-key
+   MAILJET_SECRET_KEY=your-mailjet-secret-key
+   MAILJET_FROM_EMAIL=your-email@example.com
+   MAILJET_FROM_NAME=Your Name
+   MAILJET_TO_EMAIL=recipient-email@example.com
+   MAILJET_TO_NAME=Recipient Name
+   COINMARKETCAP_API_KEY=your-coinmarketcap-api-key
+   ```
 
+## Usage
 
+1. Start the application:
 
-### TRADING PLAN
+   ```bash
+   node index.js
+   ```
 
-1. (ongoing) swing trading
-- manual
-- ai-assisted (notifications at certain price levels)
-  - notification = triggering an email sent to myself?
-  - something simpler
+2. The application will check the prices of the specified cryptocurrencies and send email notifications if the price crosses the defined thresholds.
 
-2. market open
-- daily
-- weekly
+3. To run the price check at regular intervals, you can uncomment the `setInterval` line in the code and adjust the time frame as needed.
 
+## Configuration
 
-### TRICKS
-- biggest expected movers?
-- copy trading?
--
+- The cryptocurrencies to monitor and their respective high/low thresholds are defined in the `assets_to_watch` array within the code. You can modify this array to add or remove cryptocurrencies or adjust the thresholds.
 
+## License
 
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-#### TOOLS
-- coinmarketcap (10k free calls a month)
-  (30 days) / (10 minutes) =  4320
-  - this may need to be where the notifications get triggered
+## Contributing
 
-- trading view notifications?
-- coinbase api?
-- openai?
-- maybe I just do manual trades w/ AI-assisted
+Contributions are welcome! Please feel free to submit a pull request or open an issue.
+
+## Acknowledgments
+
+- [CoinMarketCap API](https://coinmarketcap.com/api/)
+- [Mailjet](https://www.mailjet.com/)
