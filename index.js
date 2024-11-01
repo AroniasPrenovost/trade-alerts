@@ -139,7 +139,7 @@ async function fetchCurrentPriceData(symbol) {
   }
 }
 
-async function checkAssets() {
+async function checkAssetPrices() {
   const date = new Date();
   console.log(date)
   for (const asset of assets_to_watch) {
@@ -161,8 +161,8 @@ async function checkAssets() {
   console.log(' ');
 }
 
-// Check every X time frame
-setInterval(checkAssets, 60 * 60 * 1000); // 60 minutes
+// Check every X time frame (ran via cron job)
+// setInterval(checkAssetPrices, 60 * 60 * 1000); // 60 minutes
 
 // Initial check
-checkAssets();
+checkAssetPrices();
