@@ -28,10 +28,13 @@ const MAILJET_FROM_NAME = process.env.MAILJET_FROM_NAME;
 const MAILJET_TO_EMAIL = process.env.MAILJET_TO_EMAIL;
 const MAILJET_TO_NAME = process.env.MAILJET_TO_NAME;
 
-function sendTradeNotification(asset_symbol, price, buy_or_sell) {
-    const subject = `Trade Recommendation: ${buy_or_sell.toUpperCase()} ${asset_symbol}`;
-    const textPart = `Trade Recommendation: ${buy_or_sell.toUpperCase()} ${asset_symbol} at ${price}.`;
-    const htmlPart = `<h3>${buy_or_sell.toUpperCase()}</h3><p> ${asset_symbol} at ${price}.</p>`;
+function sendTradeNotification(asset, price, buy_or_sell) {
+    const subject = `Trade Recommendation: ${buy_or_sell.toUpperCase()} ${asset.symbol}`;
+    const textPart = `Trade Recommendation: ${buy_or_sell.toUpperCase()} ${asset.symbol} at ${price}.`;
+    const htmlPart = `<h3>${asset.symbol} - ${buy_or_sell.toUpperCase()}</h3>
+    <h4>current price: ${price}</h4>
+    <p>LOW: ${asset.low}</p>
+    <p>HIGH: ${asset.high}.</p>`;
 
     mailjet
         .post('send', { version: 'v3.1' })
@@ -146,10 +149,10 @@ async function checkAssets() {
       // console.log(`${asset.symbol} price (USD): ${price}`);
       if (price > asset.high) {
         console.log('price is above supprt', price)
-        // sendTradeNotification(asset.symbol, price, 'sell');
+        sendTradeNotification(asset, price, 'sell');
       } else if (price < asset.low) {
         console.log('price is below support', price)
-        // sendTradeNotification(asset.symbol, price, 'buy');
+        sendTradeNotification(asset, price, 'buy');
       } else {
         console.log('price is between high and low', price)
       }
