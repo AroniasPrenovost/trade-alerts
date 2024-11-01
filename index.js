@@ -102,6 +102,7 @@ async function checkAssets() {
       }
     }
   }
+  console.log(' ');
 }
 
 // Check assets every 10 minutes
