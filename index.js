@@ -159,6 +159,7 @@ async function checkAssetPrices() {
         console.log('price is below support', price)
         sendTradeNotification(asset, price, 'buy');
       } else {
+        sendTradeNotification(asset, price, 'hold');
         console.log('price is between high and low', price)
       }
     }

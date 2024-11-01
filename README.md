@@ -54,7 +54,31 @@ This project is a Node.js application that monitors cryptocurrency prices using 
 
 2. The application will check the prices of the specified cryptocurrencies and send email notifications if the price crosses the defined thresholds.
 
-3. To run the price check at regular intervals, you can uncomment the `setInterval` line in the code and adjust the time frame as needed.
+3. To run the price check at regular intervals, you can set up a `cron` job. A `cron` job allows you to schedule scripts or commands to run automatically at specified intervals. Here's how you can set up a `cron` job to run the price check script at regular intervals:
+
+### Setting Up a Cron Job
+
+1. **Open the Crontab File:**
+
+   To edit the cron jobs, open the crontab file in the terminal:
+
+   ```bash
+   crontab -e
+   ```
+
+2. **Add a New Cron Job:**
+
+   To run the price check script at regular intervals, add a new line to the crontab file. For example, to run the script every hour, you can add:
+
+   ```bash
+   0 * * * * /usr/bin/node /path/to/your/project/index.js
+   ```
+
+   This cron expression `0 * * * *` means the script will run at the start of every hour. Make sure to replace `/path/to/your/project/index.js` with the actual path to your script.
+
+3. **Save and Exit:**
+
+   After adding the cron job, save the file and exit the editor. The cron job will now be scheduled to run at the specified intervals.
 
 ## Configuration
 
