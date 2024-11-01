@@ -105,8 +105,8 @@ async function checkAssets() {
   console.log(' ');
 }
 
-// Check assets every 10 minutes
-setInterval(checkAssets, 10 * 60 * 1000);
+// Check every X time frame
+setInterval(checkAssets, 10 * 60 * 1000); // 10 minutes
 
 // Initial check
 checkAssets();
