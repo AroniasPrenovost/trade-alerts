@@ -10,7 +10,7 @@ const ASSET_LIST = [
   { symbol: 'AVAX', high_resistance: 29, low_resistance: 22, entry: 25.49, sellLimit: 29, shares: 3.99870057 },
   { symbol: 'DOT', high_resistance: 5.50, low_resistance: 3, entry: 3.873, sellLimit: 4.8, shares: 12.99331849 },
   { symbol: 'UNI', high_resistance: 10.0, low_resistance: 8, entry: 0, sellLimit: 0, shares: 0 },
-  { symbol: 'ADA', high_resistance: .35, low_resistance: .33, entry: .33, sellLimit: .36, shares: 1 },
+  { symbol: 'ADA', high_resistance: .35, low_resistance: .33, entry: .33, sellLimit: .36, shares: 0 },
 ];
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
@@ -330,15 +330,23 @@ const processAsset = async (asset) => {
   });
 
   // alerts
-  if (currentPrice > asset.high_resistance) {
+  const SELL_SIGNAL = asset.shares > 0
+    && currentPrice > asset.high_resistance;
+  const BUY_SIGNAL = asset.shares > 0
+    && currentPrice < asset.low_resistance;
+
+  if (SELL_SIGNAL) {
     sendTradeNotification(asset, currentPrice, 'sell');
-    console.log(' ');
-  } else if (currentPrice < asset.low_resistance) {
+  }
+
+  if (BUY_SIGNAL) {
     sendTradeNotification(asset, currentPrice, 'buy');
-    console.log(' ');
-  } else {
+  }
+
+  if (!SELL_SIGNAL && !BUY_SIGNAL) {
     // console.log('price is between high and low', price);
   }
+
   console.log('__________________________');
   console.log(' ');
 };
