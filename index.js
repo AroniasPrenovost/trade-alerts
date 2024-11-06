@@ -250,12 +250,9 @@ const calculateEMA = (symbol, period = 14) => {
 const processAsset = async (asset) => {
   deleteOldEntries(asset.symbol);
   await getAndProcessAssetPriceAndNotify(asset);
-  // custom indicators
-  // calculateRSI(asset.symbol);
-  // calculateSMA(asset.symbol);
-  // calculateEMA(asset.symbol);
   console.log({
     symbol: asset.symbol,
+    // custom indicators
     rsi: calculateRSI(asset.symbol),
     sma: calculateSMA(asset.symbol),
     ema: calculateEMA(asset.symbol),
