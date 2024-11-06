@@ -46,7 +46,7 @@ const sendTradeNotification = (asset, price, action) => {
         },
       ],
     })
-    .then((result) => console.log(`ALERT SENT: ${result.body.Messages[0].To[0].Email} - ${new Date()}`))
+    .then((result) => console.log(`ALERT: ${result.body.Messages[0].To[0].Email} - ${new Date()}`))
     .catch((err) => console.log(err.statusCode));
 };
 
@@ -121,7 +121,8 @@ const fetchCurrentAssetData = async (symbol) => {
   }
 };
 
-const appendToFile = (symbol, data) => {
+const appendToFile = (data) => {
+  const symbol = data.symbol;
   const filePath = path.join(__dirname, `${symbol}_price_history.json`);
   const fileData = getFileContents(symbol);
   fileData.push(data);
@@ -264,7 +265,7 @@ const calculateProfitAtSellLimit = (entryPrice, sellLimitPrice, taxRate, shares)
 console.log(' ');
 console.log(' ');
 console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
-console.log(' ** ** ** ** swing trader * ** ** ** ** ** ** **');
+console.log(' ** ** ** ** SWING TRADER * ** ** ** ** ** ** **');
 console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
 console.log(' ');
 console.log(' ');
@@ -274,7 +275,7 @@ const processAsset = async (asset) => {
 
   deleteOldEntries(asset.symbol);
 
-  const newAssetData = await getAndProcessAssetPriceData(asset.symbol);
+  const assetData = await getAndProcessAssetPriceData(asset.symbol);
   /*
       {
         symbol: asset.symbol,
@@ -291,10 +292,12 @@ const processAsset = async (asset) => {
         date: Date.now(),
       }
   */
-  const currentPrice = newAssetData.price;
-  appendToFile(asset.symbol, newAssetData);
 
-  const { currentNetProfit, currentTaxOwed, currentRealizedProfitsPercentage } = calculateCurrentProfit(asset.entry, newAssetData.price, TAX_RATE, asset.shares);
+  appendToFile(assetData);
+
+  const currentPrice = assetData.price;
+
+  const { currentNetProfit, currentTaxOwed, currentRealizedProfitsPercentage } = calculateCurrentProfit(asset.entry, currentPrice, TAX_RATE, asset.shares);
   const { sellLimitNetProfit, sellLimitTaxOwed, sellLimitRealizedProfitsPercentage } = calculateProfitAtSellLimit(asset.entry, asset.sellLimit, TAX_RATE, asset.shares);
 
   console.log({
@@ -308,24 +311,28 @@ const processAsset = async (asset) => {
       entryPrice: asset.entry,
       sharesHeld: asset.shares,
       taxRatePercentage: TAX_RATE,
-      current: {
+      ifISoldNow: {
         netProfit: `$${currentNetProfit.toFixed(2)}`,
-        taxOwed: `$${currentTaxOwed}`,
+        taxOwed: `$${currentTaxOwed.toFixed(2)}`,
+        realizedProfit: `$${(currentNetProfit - currentTaxOwed).toFixed(2)}`,
         realizedProfitsPercentage: `${Number(currentRealizedProfitsPercentage.toFixed(2))}%`,
       },
       sellLimit: {
         netProfit: `$${sellLimitNetProfit.toFixed(2)}`,
-        taxOwed: `$${sellLimitTaxOwed}`,
+        taxOwed: `$${sellLimitTaxOwed.toFixed(2)}`,
+        realizedProfit: `$${(sellLimitNetProfit - sellLimitTaxOwed).toFixed(2)}`,
         realizedProfitsPercentage: `${Number(sellLimitRealizedProfitsPercentage.toFixed(2))}%`,
       },
     },
   });
 
-  // send alerts
+  // alerts
   if (currentPrice > asset.high) {
     sendTradeNotification(asset, currentPrice, 'sell');
+    console.log(' ');
   } else if (currentPrice < asset.low) {
     sendTradeNotification(asset, currentPrice, 'buy');
+    console.log(' ');
   } else {
     // console.log('price is between high and low', price);
   }
