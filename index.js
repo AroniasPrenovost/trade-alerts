@@ -5,8 +5,8 @@ const fs = require('fs');
 const path = require('path');
 
 const ASSET_LIST = [
-  { symbol: 'AVAX', high: 29, low: 22 },
-  { symbol: 'DOT', high: 5.50, low: 3 },
+  { symbol: 'AVAX', high: 29, low: 22, },
+  // { symbol: 'DOT', high: 5.50, low: 3 },
 ];
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
@@ -132,11 +132,49 @@ const calculateRSI = (symbol) => {
   return { rsi: rsi.toFixed(2), overbought_or_oversold: overboughtOrOversold };
 };
 
+const calculateSMA = (symbol, period = 14) => {
+  const data = getFileContents(symbol);
+  if (data.length < period) {
+    console.log(`Not enough data to calculate SMA for ${symbol}`);
+    return;
+  }
+
+  const recentData = data.slice(-period);
+  const sum = recentData.reduce((acc, entry) => acc + entry.price, 0);
+  const sma = sum / period;
+
+  console.log(`SMA for ${symbol} over ${period} days: ${sma.toFixed(2)}`);
+  return sma.toFixed(2);
+};
+
+const calculateEMA = (symbol, period = 14) => {
+  const data = getFileContents(symbol);
+  if (data.length < period) {
+    console.log(`Not enough data to calculate EMA for ${symbol}`);
+    return;
+  }
+
+  const k = 2 / (period + 1);
+  let ema = data.slice(0, period).reduce((acc, entry) => acc + entry.price, 0) / period;
+
+  for (let i = period; i < data.length; i++) {
+    ema = data[i].price * k + ema * (1 - k);
+  }
+
+  console.log(`EMA for ${symbol} over ${period} days: ${ema.toFixed(2)}`);
+  return ema.toFixed(2);
+};
+
+
 // main loop
 const processAsset = async (asset) => {
   deleteOldEntries(asset.symbol);
   await processAssetPrice(asset);
   calculateRSI(asset.symbol);
+
+  calculateRSI(asset.symbol);
+  calculateSMA(asset.symbol);
+  calculateEMA(asset.symbol);
 };
 
 ASSET_LIST.forEach(processAsset);

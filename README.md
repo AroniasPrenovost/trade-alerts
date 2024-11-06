@@ -96,3 +96,58 @@ Contributions are welcome! Please feel free to submit a pull request or open an 
 
 - [CoinMarketCap API](https://coinmarketcap.com/api/)
 - [Mailjet](https://www.mailjet.com/)
+
+
+
+/*
+
+{
+ id: 5805,
+ name: 'Avalanche',
+ symbol: 'AVAX',
+ slug: 'avalanche',
+ num_market_pairs: 796,
+ date_added: '2020-07-13T00:00:00.000Z',
+ tags: [
+   'defi',
+   'smart-contracts',
+   'three-arrows-capital-portfolio',
+   'polychain-capital-portfolio',
+   'avalanche-ecosystem',
+   'cms-holdings-portfolio',
+   'dragonfly-capital-portfolio',
+   'real-world-assets',
+   'layer-1'
+ ],
+ max_supply: 715748719,
+ circulating_supply: 407095358.7405858,
+ total_supply: 447098458.7405858,
+ is_active: 1,
+ infinite_supply: false,
+ platform: null,
+ cmc_rank: 13,
+ is_fiat: 0,
+ self_reported_circulating_supply: null,
+ self_reported_market_cap: null,
+ tvl_ratio: null,
+ last_updated: '2024-10-30T21:37:00.000Z',
+ quote: {
+   USD: {
+     price: 26.261409930816203,
+     volume_24h: 245819804.54966748,
+     volume_change_24h: -15.8572,
+     percent_change_1h: -0.00456268,
+     percent_change_24h: -1.38814989,
+     percent_change_7d: -1.34416107,
+     percent_change_30d: -6.86169753,
+     percent_change_60d: 15.41194715,
+     percent_change_90d: 3.12103704,
+     market_cap: 10690898096.819204,
+     market_cap_dominance: 0.4399,
+     fully_diluted_market_cap: 18796570517.12,
+     tvl: null,
+     last_updated: '2024-10-30T21:37:00.000Z'
+   }
+ }
+
+*/
