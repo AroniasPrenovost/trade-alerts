@@ -6,7 +6,7 @@ const path = require('path');
 
 const ASSET_LIST = [
   { symbol: 'AVAX', high: 29, low: 22 },
-  { symbol: 'DOT', high: 10, low: 3 },
+  { symbol: 'DOT', high: 5.50, low: 3 },
 ];
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
@@ -63,25 +63,16 @@ const fetchCurrentPriceData = async (symbol) => {
   }
 };
 
-const processAssetPrice = async (asset) => {
-  const price = await fetchCurrentPriceData(asset.symbol);
-  if (price !== null) {
-    if (price > asset.high) {
-      sendTradeNotification(asset, price, 'sell');
-    } else if (price < asset.low) {
-      sendTradeNotification(asset, price, 'buy');
-    } else {
-      console.log('price is between high and low', price);
-    }
-    appendToFile(asset.symbol, { symbol: asset.symbol, price, date: Date.now() });
-  }
-};
-
 const appendToFile = (symbol, data) => {
   const filePath = path.join(__dirname, `${symbol}_price_history.json`);
-  const fileData = fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : [];
+  const fileData = getFileContents(symbol);
   fileData.push(data);
   fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
+};
+
+const getFileContents = (symbol) => {
+  const filePath = path.join(__dirname, `${symbol}_price_history.json`);
+  return fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : [];
 };
 
 const deleteOldEntries = () => {
@@ -97,14 +88,22 @@ const deleteOldEntries = () => {
   });
 };
 
-const calculateRSI = (symbol) => {
-  const filePath = path.join(__dirname, `${symbol}_price_history.json`);
-  if (!fs.existsSync(filePath)) {
-    console.log(`No data available for ${symbol}`);
-    return;
+const processAssetPrice = async (asset) => {
+  const price = await fetchCurrentPriceData(asset.symbol);
+  if (price !== null) {
+    if (price > asset.high) {
+      sendTradeNotification(asset, price, 'sell');
+    } else if (price < asset.low) {
+      sendTradeNotification(asset, price, 'buy');
+    } else {
+      console.log('price is between high and low', price);
+    }
+    appendToFile(asset.symbol, { symbol: asset.symbol, price, date: Date.now() });
   }
+};
 
-  const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+const calculateRSI = (symbol) => {
+  const data = getFileContents(symbol);
   const fourteenDaysAgo = Date.now() - (14 * 24 * 60 * 60 * 1000);
   const recentData = data.filter(entry => entry.date >= fourteenDaysAgo);
 
