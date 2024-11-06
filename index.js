@@ -142,9 +142,12 @@ const deleteOldEntries = (symbol) => {
 
 const getAndProcessAssetPriceAndNotify = async (asset) => {
   const assetData = await fetchCurrentAssetData(asset.symbol);
-  const price = Number(assetData.quote.USD.price ?? 0);
-  console.log({assetData, price})
-  if (price !== null) {
+  if (assetData !== null) {
+
+    const price = Number(assetData.quote.USD.price ?? 0);
+
+    console.log({assetData, price})
+
     if (price > asset.high) {
       sendTradeNotification(asset, price, 'sell');
     } else if (price < asset.low) {
@@ -224,6 +227,31 @@ const calculateEMA = (symbol, period = 14) => {
   return ema.toFixed(2);
 };
 
+// function calculateDesiredProfit(entryPrice, exitPrice, shares, tradingFee = 0, shortTermTaxRate = 0.22) {
+//     // Calculate the total cost basis
+//     const totalCostBasis = entryPrice * shares + tradingFee;
+//
+//     // Calculate the total revenue from selling
+//     const totalRevenue = exitPrice * shares - tradingFee;
+//
+//     // Calculate the pre-tax profit
+//     const preTaxProfit = totalRevenue - totalCostBasis;
+//
+//     // Calculate the desired profit after accounting for taxes
+//     const desiredProfit = preTaxProfit * (1 - shortTermTaxRate);
+//
+//     return desiredProfit;
+// }
+//
+// // Example usage:
+// const entryPrice = 25.48; // Entry price per share
+// const exitPrice = 29; // Target exit price per share
+// const shares = 10; // Number of shares
+// const tradingFee = 10; // Trading fee in dollars
+//
+// const desiredProfit = calculateDesiredProfit(entryPrice, exitPrice, shares, tradingFee);
+// console.log(`The desired profit to be in the green is $${desiredProfit.toFixed(2)}`);
+// return;
 
 // main loop
 const processAsset = async (asset) => {
