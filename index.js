@@ -87,7 +87,7 @@ const deleteOldEntries = (symbol) => {
   }
 };
 
-const getAndProcessAssetPriceAndAlert = async (asset) => {
+const getAndProcessAssetPriceAndNotify = async (asset) => {
   const price = await fetchCurrentPriceData(asset.symbol);
   if (price !== null) {
     if (price > asset.high) {
@@ -132,7 +132,7 @@ const calculateRSI = (symbol) => {
 
   const overboughtOrOversold = rsi > 70 ? 'overbought' : rsi < 30 ? 'oversold' : 'neutral';
 
-  console.log(`RSI for ${symbol}: ${rsi.toFixed(2)}, Status: ${overboughtOrOversold}`);
+  // console.log(`RSI for ${symbol}: ${rsi.toFixed(2)}, Status: ${overboughtOrOversold}`);
   return { rsi: rsi.toFixed(2), overbought_or_oversold: overboughtOrOversold };
 };
 
@@ -147,8 +147,7 @@ const calculateSMA = (symbol, period = 14) => {
   const recentData = data.slice(-period);
   const sum = recentData.reduce((acc, entry) => acc + entry.price, 0);
   const sma = sum / period;
-
-  console.log(`SMA for ${symbol} over ${period} days: ${sma.toFixed(2)}`);
+  // console.log(`SMA for ${symbol} over ${period} days: ${sma.toFixed(2)}`);
   return sma.toFixed(2);
 };
 
@@ -166,8 +165,7 @@ const calculateEMA = (symbol, period = 14) => {
   for (let i = period; i < data.length; i++) {
     ema = data[i].price * k + ema * (1 - k);
   }
-
-  console.log(`EMA for ${symbol} over ${period} days: ${ema.toFixed(2)}`);
+  // console.log(`EMA for ${symbol} over ${period} days: ${ema.toFixed(2)}`);
   return ema.toFixed(2);
 };
 
@@ -175,11 +173,17 @@ const calculateEMA = (symbol, period = 14) => {
 // main loop
 const processAsset = async (asset) => {
   deleteOldEntries(asset.symbol);
-  await getAndProcessAssetPriceAndAlert(asset);
+  await getAndProcessAssetPriceAndNotify(asset);
   // custom indicators
-  calculateRSI(asset.symbol);
-  calculateSMA(asset.symbol);
-  calculateEMA(asset.symbol);
+  // calculateRSI(asset.symbol);
+  // calculateSMA(asset.symbol);
+  // calculateEMA(asset.symbol);
+  console.log({
+    symbol: asset.symbol,
+    rsi: calculateRSI(asset.symbol),
+    sma: calculateSMA(asset.symbol),
+    ema: calculateEMA(asset.symbol),
+  })
 };
 
 ASSET_LIST.forEach(processAsset);
