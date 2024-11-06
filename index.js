@@ -4,6 +4,8 @@ const Mailjet = require('node-mailjet');
 const fs = require('fs');
 const path = require('path');
 
+const TAX_RATE = 24;
+
 const ASSET_LIST = [
   { symbol: 'AVAX', high: 29, low: 22, entry: 25.48 },
   // { symbol: 'DOT', high: 5.50, low: 3, entry: 4.08 },
