@@ -87,7 +87,7 @@ const deleteOldEntries = (symbol) => {
   }
 };
 
-const processAssetPrice = async (asset) => {
+const getAndProcessAssetPriceAndAlert = async (asset) => {
   const price = await fetchCurrentPriceData(asset.symbol);
   if (price !== null) {
     if (price > asset.high) {
@@ -169,7 +169,7 @@ const calculateEMA = (symbol, period = 14) => {
 // main loop
 const processAsset = async (asset) => {
   deleteOldEntries(asset.symbol);
-  await processAssetPrice(asset);
+  await getAndProcessAssetPriceAndAlert(asset);
   // custom indicators
   calculateRSI(asset.symbol);
   calculateSMA(asset.symbol);
