@@ -4,13 +4,12 @@ const Mailjet = require('node-mailjet');
 const fs = require('fs');
 const path = require('path');
 
-// dotenv.config();
-
-const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
 const ASSET_LIST = [
   { symbol: 'AVAX', high: 29, low: 22 },
   { symbol: 'DOT', high: 10, low: 3 },
 ];
+
+const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
 
 const mailjet = Mailjet.apiConnect(
   process.env.MAILJET_API_KEY,
