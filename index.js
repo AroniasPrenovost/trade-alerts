@@ -9,6 +9,8 @@ const TAX_RATE = Number(process.env.TAX_RATE); // 24
 const ASSET_LIST = [
   { symbol: 'AVAX', high: 29, low: 22, entry: 25.49, sellLimit: 29, shares: 3.99870057 },
   { symbol: 'DOT', high: 5.50, low: 3, entry: 3.873, sellLimit: 4.8, shares: 12.99331849 },
+  { symbol: 'UNI', high: 10.0, low: 8, entry: 0, sellLimit: 0, shares: 0 },
+  { symbol: 'ADA', high: .35, low: .33, entry: .33, sellLimit: .36, shares: 1 },
 ];
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
@@ -114,6 +116,7 @@ const fetchCurrentAssetData = async (symbol) => {
     */
   } catch (error) {
     console.error('Error fetching latest data:', error);
+    console.log('symbol: ', symbol);
     return null;
   }
 };
@@ -257,33 +260,46 @@ const calculateProfitAtSellLimit = (entryPrice, sellLimitPrice, taxRate, shares)
   return { sellLimitNetProfit, sellLimitTaxOwed, sellLimitRealizedProfitsPercentage };
 };
 
+
+console.log(' ');
+console.log(' ');
+console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
+console.log(' ** ** ** ** swing trader * ** ** ** ** ** ** **');
+console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
+console.log(' ');
+console.log(' ');
+
 // main loop
 const processAsset = async (asset) => {
+
   deleteOldEntries(asset.symbol);
+
   const newAssetData = await getAndProcessAssetPriceData(asset.symbol);
-  appendToFile(asset.symbol, newAssetData
-    //   {
-    //   symbol: asset.symbol,
-    //   price,
-    //   volume_24h,
-    //   volume_change_24h,
-    //   percent_change_1h,
-    //   percent_change_24h,
-    //   percent_change_7d,
-    //   percent_change_30d,
-    //   percent_change_60d,
-    //   percent_change_90d,
-    //   market_cap,
-    //   date: Date.now(),
-    // }
-  );
+  /*
+      {
+        symbol: asset.symbol,
+        price,
+        volume_24h,
+        volume_change_24h,
+        percent_change_1h,
+        percent_change_24h,
+        percent_change_7d,
+        percent_change_30d,
+        percent_change_60d,
+        percent_change_90d,
+        market_cap,
+        date: Date.now(),
+      }
+  */
+  const currentPrice = newAssetData.price;
+  appendToFile(asset.symbol, newAssetData);
 
   const { currentNetProfit, currentTaxOwed, currentRealizedProfitsPercentage } = calculateCurrentProfit(asset.entry, newAssetData.price, TAX_RATE, asset.shares);
   const { sellLimitNetProfit, sellLimitTaxOwed, sellLimitRealizedProfitsPercentage } = calculateProfitAtSellLimit(asset.entry, asset.sellLimit, TAX_RATE, asset.shares);
 
   console.log({
     symbol: asset.symbol,
-    price: newAssetData.price,
+    price: currentPrice,
     // custom indicators
     rsi: calculateRSI(asset.symbol),
     sma: calculateSMA(asset.symbol),
@@ -292,23 +308,25 @@ const processAsset = async (asset) => {
       entryPrice: asset.entry,
       sharesHeld: asset.shares,
       taxRatePercentage: TAX_RATE,
-      currentNetProfit: currentNetProfit,
-      currentTaxOwed: currentTaxOwed,
-      currentRealizedProfitsPercentage: Number(currentRealizedProfitsPercentage.toFixed(2)),
-      sellLimitNetProfit: sellLimitNetProfit,
-      sellLimitTaxOwed: sellLimitTaxOwed,
-      sellLimitRealizedProfitsPercentage: Number(sellLimitRealizedProfitsPercentage.toFixed(2)),
+      currentNetProfit: `$${currentNetProfit.toFixed(2)}`,
+      currentTaxOwed: `$${currentTaxOwed}`,
+      currentRealizedProfitsPercentage: `${Number(currentRealizedProfitsPercentage.toFixed(2))}%`,
+      sellLimitNetProfit: `$${sellLimitNetProfit.toFixed(2)}`,
+      sellLimitTaxOwed: `$${sellLimitTaxOwed}`,
+      sellLimitRealizedProfitsPercentage: `${Number(sellLimitRealizedProfitsPercentage.toFixed(2))}%`,
     },
   });
 
   // send alerts
-  if (newAssetData.price > asset.high) {
-    sendTradeNotification(asset, price, 'sell');
-  } else if (newAssetData.price < asset.low) {
-    sendTradeNotification(asset, price, 'buy');
+  if (currentPrice > asset.high) {
+    sendTradeNotification(asset, currentPrice, 'sell');
+  } else if (currentPrice < asset.low) {
+    sendTradeNotification(asset, currentPrice, 'buy');
   } else {
     // console.log('price is between high and low', price);
   }
+  console.log('____________');
+  console.log(' ');
 };
 
 ASSET_LIST.forEach(processAsset);
