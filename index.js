@@ -7,8 +7,8 @@ const path = require('path');
 const TAX_RATE = Number(process.env.TAX_RATE); // 24
 
 const ASSET_LIST = [
-  { symbol: 'AVAX', high: 29, low: 22, entry: 25.48, sellLimit: 29, shares: 8 },
-  // { symbol: 'DOT', high: 5.50, low: 3, entry: 4.08, sellLimit: 5.50 shares: 20 },
+  { symbol: 'AVAX', high: 29, low: 22, entry: 25.49, sellLimit: 29, shares: 3.99870057 },
+  { symbol: 'DOT', high: 5.50, low: 3, entry: 3.873, sellLimit: 4.8, shares: 12.99331849 },
 ];
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
@@ -244,7 +244,8 @@ const calculateCurrentProfit = (entryPrice, currentPrice, taxRate, shares) => {
   const totalGrossProfit = grossProfitPerShare * shares;
   const currentTaxOwed = totalGrossProfit * (taxRate / 100);
   const currentNetProfit = totalGrossProfit - currentTaxOwed;
-  return { currentNetProfit, currentTaxOwed };
+  const currentRealizedProfitsPercentage = (grossProfitPerShare / entryPrice) * 100;
+  return { currentNetProfit, currentTaxOwed, currentRealizedProfitsPercentage };
 };
 
 const calculateProfitAtSellLimit = (entryPrice, sellLimitPrice, taxRate, shares) => {
@@ -252,7 +253,8 @@ const calculateProfitAtSellLimit = (entryPrice, sellLimitPrice, taxRate, shares)
   const totalGrossProfit = grossProfitPerShare * shares;
   const sellLimitTaxOwed = totalGrossProfit * (taxRate / 100);
   const sellLimitNetProfit = totalGrossProfit - sellLimitTaxOwed;
-  return { sellLimitNetProfit, sellLimitTaxOwed };
+  const sellLimitRealizedProfitsPercentage = (grossProfitPerShare / entryPrice) * 100;
+  return { sellLimitNetProfit, sellLimitTaxOwed, sellLimitRealizedProfitsPercentage };
 };
 
 // main loop
@@ -276,8 +278,8 @@ const processAsset = async (asset) => {
     // }
   );
 
-  const { currentNetProfit, currentTaxOwed } = calculateCurrentProfit(asset.entry, newAssetData.price, TAX_RATE, asset.shares);
-  const { sellLimitNetProfit, sellLimitTaxOwed } = calculateProfitAtSellLimit(asset.entry, asset.sellLimit, TAX_RATE, asset.shares);
+  const { currentNetProfit, currentTaxOwed, currentRealizedProfitsPercentage } = calculateCurrentProfit(asset.entry, newAssetData.price, TAX_RATE, asset.shares);
+  const { sellLimitNetProfit, sellLimitTaxOwed, sellLimitRealizedProfitsPercentage } = calculateProfitAtSellLimit(asset.entry, asset.sellLimit, TAX_RATE, asset.shares);
 
   console.log({
     symbol: asset.symbol,
@@ -292,8 +294,10 @@ const processAsset = async (asset) => {
       taxRatePercentage: TAX_RATE,
       currentNetProfit: currentNetProfit,
       currentTaxOwed: currentTaxOwed,
+      currentRealizedProfitsPercentage: Number(currentRealizedProfitsPercentage.toFixed(2)),
       sellLimitNetProfit: sellLimitNetProfit,
       sellLimitTaxOwed: sellLimitTaxOwed,
+      sellLimitRealizedProfitsPercentage: Number(sellLimitRealizedProfitsPercentage.toFixed(2)),
     },
   });
 
