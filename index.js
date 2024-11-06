@@ -7,8 +7,8 @@ const path = require('path');
 const TAX_RATE = Number(process.env.TAX_RATE); // 24
 
 const ASSET_LIST = [
-  { symbol: 'AVAX', high: 29, low: 22, entry: 25.48, shares: 8 },
-  // { symbol: 'DOT', high: 5.50, low: 3, entry: 4.08, shares: 20 },
+  { symbol: 'AVAX', high: 29, low: 22, entry: 25.48, sellLimit: 29, shares: 8 },
+  // { symbol: 'DOT', high: 5.50, low: 3, entry: 4.08, sellLimit: 5.50 shares: 20 },
 ];
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
@@ -242,9 +242,17 @@ const calculateEMA = (symbol, period = 14) => {
 const calculatePotentialProfit = (entryPrice, currentPrice, taxRate, shares) => {
   const grossProfitPerShare = currentPrice - entryPrice;
   const totalGrossProfit = grossProfitPerShare * shares;
+  const potentialTaxOwed = totalGrossProfit * (taxRate / 100);
+  const potentialNetProfit = totalGrossProfit - potentialTaxOwed;
+  return { potentialNetProfit, potentialTaxOwed };
+};
+
+const calculateProfitAtSellLimit = (entryPrice, sellLimitPrice, taxRate, shares) => {
+  const grossProfitPerShare = sellLimitPrice - entryPrice;
+  const totalGrossProfit = grossProfitPerShare * shares;
   const taxOwed = totalGrossProfit * (taxRate / 100);
   const netProfit = totalGrossProfit - taxOwed;
-  return { netProfit, taxOwed };
+  return { netProfitAtSellLimit, taxOwed };
 };
 
 // main loop
@@ -268,7 +276,8 @@ const processAsset = async (asset) => {
     // }
   );
 
-  const { netProfit, taxOwed } = calculatePotentialProfit(asset.entry, newAssetData.price, TAX_RATE, asset.shares);
+  const { potentialNetProfit, potentialTaxOwed } = calculatePotentialProfit(asset.entry, newAssetData.price, TAX_RATE, asset.shares);
+  // const { netProfit: sellLimitNetProfit, taxOwed: sellLimitTaxOwed } = calculateProfitAtSellLimit(asset.entry, asset.sellLimit, TAX_RATE, asset.shares);
 
   console.log({
     symbol: asset.symbol,
@@ -281,12 +290,14 @@ const processAsset = async (asset) => {
       entryPrice: asset.entry,
       sharesHeld: asset.shares,
       taxRatePercentage: TAX_RATE,
-      potentialNetProfit: netProfit,
-      potentialTaxOwed: taxOwed,
+      potentialNetProfit: potentialNetProfit,
+      potentialTaxOwed: potentialTaxOwed,
+      // sellLimitNetProfit: sellLimitNetProfit,
+      // sellLimitTaxOwed: sellLimitTaxOwed,
     },
   });
 
-  // send alerts 
+  // send alerts
   if (newAssetData.price > asset.high) {
     sendTradeNotification(asset, price, 'sell');
   } else if (newAssetData.price < asset.low) {
