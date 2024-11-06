@@ -1,31 +1,29 @@
 require('dotenv').config();
 const axios = require('axios');
 const Mailjet = require('node-mailjet');
+const fs = require('fs');
+const path = require('path');
 
 // Your CoinMarketCap API key stored in .env file
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
 
 // crypto symbols we want to watch
-const assets_to_watch = [
-  // {
-  //   symbol: 'BTC',
-  //   high: 80_000,
-  //   low: 55_000,
-  // },
+const ASSET_LIST = [
   {
     symbol: 'AVAX',
     high: 29,
     low: 22,
-},
-{
-  symbol: 'DOT',
-  high: 10,
-  low: 3,
-}];
+  },
+  {
+    symbol: 'DOT',
+    high: 10,
+    low: 3,
+  }
+];
 
 const mailjet = Mailjet.apiConnect(
-    process.env.MAILJET_API_KEY,
-    process.env.MAILJET_SECRET_KEY,
+  process.env.MAILJET_API_KEY,
+  process.env.MAILJET_SECRET_KEY,
 );
 
 const MAILJET_FROM_EMAIL = process.env.MAILJET_FROM_EMAIL;
@@ -34,40 +32,40 @@ const MAILJET_TO_EMAIL = process.env.MAILJET_TO_EMAIL;
 const MAILJET_TO_NAME = process.env.MAILJET_TO_NAME;
 
 function sendTradeNotification(asset, price, buy_or_sell) {
-    const subject = `Trade Recommendation: ${buy_or_sell.toUpperCase()} ${asset.symbol}`;
-    const textPart = `Trade Recommendation: ${buy_or_sell.toUpperCase()} ${asset.symbol} at ${price}.`;
-    const htmlPart = `<h3>${asset.symbol} - ${buy_or_sell.toUpperCase()}</h3>
-    <h4>current price: ${price}</h4>
-    <p>LOW: ${asset.low}</p>
-    <p>HIGH: ${asset.high}.</p>`;
+  const subject = `Trade Recommendation: ${buy_or_sell.toUpperCase()} ${asset.symbol}`;
+  const textPart = `Trade Recommendation: ${buy_or_sell.toUpperCase()} ${asset.symbol} at ${price}.`;
+  const htmlPart = `<h3>${asset.symbol} - ${buy_or_sell.toUpperCase()}</h3>
+  <h4>current price: ${price}</h4>
+  <p>LOW: ${asset.low}</p>
+  <p>HIGH: ${asset.high}.</p>`;
 
-    mailjet
-        .post('send', { version: 'v3.1' })
-        .request({
-            Messages: [
-                {
-                    From: {
-                        Email: MAILJET_FROM_EMAIL,
-                        Name: MAILJET_FROM_NAME,
-                    },
-                    To: [
-                        {
-                            Email: MAILJET_TO_EMAIL,
-                            Name: MAILJET_TO_NAME,
-                        }
-                    ],
-                    Subject: subject,
-                    TextPart: textPart,
-                    HTMLPart: htmlPart
-                }
-            ]
-        })
-        .then((result) => {
-            console.log(`ALERT SENT: ${result.body.Messages[0].To[0].Email} - ${new Date()}`);
-        })
-        .catch((err) => {
-            console.log(err.statusCode);
-        });
+  mailjet
+    .post('send', { version: 'v3.1' })
+    .request({
+      Messages: [
+        {
+          From: {
+            Email: MAILJET_FROM_EMAIL,
+            Name: MAILJET_FROM_NAME,
+          },
+          To: [
+            {
+              Email: MAILJET_TO_EMAIL,
+              Name: MAILJET_TO_NAME,
+            }
+          ],
+          Subject: subject,
+          TextPart: textPart,
+          HTMLPart: htmlPart
+        }
+      ]
+    })
+    .then((result) => {
+      console.log(`ALERT SENT: ${result.body.Messages[0].To[0].Email} - ${new Date()}`);
+    })
+    .catch((err) => {
+      console.log(err.statusCode);
+    });
 }
 
 async function fetchCurrentPriceData(symbol) {
@@ -83,59 +81,6 @@ async function fetchCurrentPriceData(symbol) {
       },
     });
 
-    /*
-
-    {
-     id: 5805,
-     name: 'Avalanche',
-     symbol: 'AVAX',
-     slug: 'avalanche',
-     num_market_pairs: 796,
-     date_added: '2020-07-13T00:00:00.000Z',
-     tags: [
-       'defi',
-       'smart-contracts',
-       'three-arrows-capital-portfolio',
-       'polychain-capital-portfolio',
-       'avalanche-ecosystem',
-       'cms-holdings-portfolio',
-       'dragonfly-capital-portfolio',
-       'real-world-assets',
-       'layer-1'
-     ],
-     max_supply: 715748719,
-     circulating_supply: 407095358.7405858,
-     total_supply: 447098458.7405858,
-     is_active: 1,
-     infinite_supply: false,
-     platform: null,
-     cmc_rank: 13,
-     is_fiat: 0,
-     self_reported_circulating_supply: null,
-     self_reported_market_cap: null,
-     tvl_ratio: null,
-     last_updated: '2024-10-30T21:37:00.000Z',
-     quote: {
-       USD: {
-         price: 26.261409930816203,
-         volume_24h: 245819804.54966748,
-         volume_change_24h: -15.8572,
-         percent_change_1h: -0.00456268,
-         percent_change_24h: -1.38814989,
-         percent_change_7d: -1.34416107,
-         percent_change_30d: -6.86169753,
-         percent_change_60d: 15.41194715,
-         percent_change_90d: 3.12103704,
-         market_cap: 10690898096.819204,
-         market_cap_dominance: 0.4399,
-         fully_diluted_market_cap: 18796570517.12,
-         tvl: null,
-         last_updated: '2024-10-30T21:37:00.000Z'
-       }
-     }
-
-    */
-
     const price = response.data.data[symbol].quote.USD.price ?? 0;
     return Number(price);
   } catch (error) {
@@ -144,28 +89,113 @@ async function fetchCurrentPriceData(symbol) {
   }
 }
 
-async function checkAssetPrices() {
+async function getAssetPrice(list) {
   const date = new Date();
   console.log(date)
-  for (const asset of assets_to_watch) {
+  for (const asset of list) {
     console.log(asset);
     const price = await fetchCurrentPriceData(asset.symbol);
     if (price !== null) {
-      // console.log(`${asset.symbol} price (USD): ${price}`);
       if (price > asset.high) {
-        console.log('price is above supprt', price)
+        console.log('price is above support', price)
         sendTradeNotification(asset, price, 'sell');
       } else if (price < asset.low) {
         console.log('price is below support', price)
         sendTradeNotification(asset, price, 'buy');
       } else {
-        sendTradeNotification(asset, price, 'hold');
+        // sendTradeNotification(asset, price, 'hold');
         console.log('price is between high and low', price)
       }
+      appendToFile(asset.symbol, { symbol: asset.symbol, price, date: Date.now() });
     }
   }
 }
 
+// Append JSON data to a file
+function appendToFile(symbol, data) {
+  const filePath = path.join(__dirname, `${symbol}_price_history.json`);
+  let fileData = [];
+
+  if (fs.existsSync(filePath)) {
+    fileData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  }
+
+  fileData.push(data);
+  fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
+}
+
+// Delete old price entries
+function deleteOldEntries() {
+  const files = fs.readdirSync(__dirname).filter(file => file.endsWith('_price_history.json'));
+  const fourteenDaysAgo = Date.now() - (14 * 24 * 60 * 60 * 1000);
+  files.forEach(file => {
+    const filePath = path.join(__dirname, file);
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const filteredData = data.filter(entry => entry.date >= fourteenDaysAgo);
+    fs.writeFileSync(filePath, JSON.stringify(filteredData, null, 2));
+    console.log(`deleted 14 day-old entries from ${filePath}`);
+  });
+}
+
+// Calculate RSI
+function calculateRSI(symbol) {
+  const filePath = path.join(__dirname, `${symbol}_price_history.json`);
+  if (!fs.existsSync(filePath)) {
+    console.log(`No data available for ${symbol}`);
+    return;
+  }
+
+  const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  const fourteenDaysAgo = Date.now() - (14 * 24 * 60 * 60 * 1000);
+  const recentData = data.filter(entry => entry.date >= fourteenDaysAgo);
+
+  if (recentData.length < 2) {
+    console.log(`Not enough data to calculate RSI for ${symbol}`);
+    return;
+  }
+
+  let gains = 0;
+  let losses = 0;
+
+  for (let i = 1; i < recentData.length; i++) {
+    const change = recentData[i].price - recentData[i - 1].price;
+    if (change > 0) {
+      gains += change;
+    } else {
+      losses -= change;
+    }
+  }
+
+  const averageGain = gains / recentData.length;
+  const averageLoss = losses / recentData.length;
+  const rs = averageGain / averageLoss;
+  const rsi = 100 - (100 / (1 + rs));
+
+  let overboughtOrOversold = null;
+  if (rsi > 70) {
+    overboughtOrOversold = 'overbought';
+  } else if (rsi < 55 && rsi > 45) {
+    overboughtOrOversold = 'neutral';
+  } else if (rsi < 30) {
+    overboughtOrOversold = 'oversold';
+  }
+
+  const result = {
+    rsi: rsi.toFixed(2),
+    overbought_or_oversold: overboughtOrOversold
+  };
+
+  console.log(`RSI for ${symbol}: ${result.rsi}, Status: ${result.overbought_or_oversold}`);
+  return result;
+}
+
+//
 // Check every X timeframe (ran via cron job)
-checkAssetPrices();
+//
+deleteOldEntries();
+
+getAssetPrice(ASSET_LIST);
+
+ASSET_LIST.forEach(asset => calculateRSI(asset.symbol));
+
 console.log(' ');

@@ -1,0 +1,36 @@
+node:fs:453
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: EPERM: operation not permitted, open '/Users/arons_stuff/Documents/trade-alerts/index.js'
+    at Object.readFileSync (node:fs:453:20)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1397:18)
+    at Module.load (node:internal/modules/cjs/loader:1207:32)
+    at Module._load (node:internal/modules/cjs/loader:1023:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:135:12)
+    at node:internal/main/run_main_module:28:49 {
+  errno: -1,
+  code: 'EPERM',
+  syscall: 'open',
+  path: '/Users/arons_stuff/Documents/trade-alerts/index.js'
+}
+
+Node.js v20.11.1
+node:fs:453
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: EPERM: operation not permitted, open '/Users/arons_stuff/Documents/trade-alerts/index.js'
+    at Object.readFileSync (node:fs:453:20)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1397:18)
+    at Module.load (node:internal/modules/cjs/loader:1207:32)
+    at Module._load (node:internal/modules/cjs/loader:1023:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:135:12)
+    at node:internal/main/run_main_module:28:49 {
+  errno: -1,
+  code: 'EPERM',
+  syscall: 'open',
+  path: '/Users/arons_stuff/Documents/trade-alerts/index.js'
+}
+
+Node.js v20.11.1
