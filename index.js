@@ -325,7 +325,7 @@ const processAsset = async (asset) => {
   } else {
     // console.log('price is between high and low', price);
   }
-  console.log('____________');
+  console.log('__________________________');
   console.log(' ');
 };
 
