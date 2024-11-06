@@ -290,7 +290,7 @@ const processAsset = async (asset) => {
     portfolio: {
       entryPrice: asset.entry,
       sharesHeld: asset.shares,
-      taxRate: TAX_RATE,
+      taxRatePercentage: TAX_RATE,
       potentialNetProfit: netProfit,
       potentialTaxOwed: taxOwed,
     },
