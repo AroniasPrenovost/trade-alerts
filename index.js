@@ -75,17 +75,16 @@ const getFileContents = (symbol) => {
   return fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : [];
 };
 
-const deleteOldEntries = () => {
+const deleteOldEntries = (symbol) => {
   const DAYS_TO_DELETE = 30; // Set this to '14' or '30' as needed
-  const files = fs.readdirSync(__dirname).filter(file => file.endsWith('_price_history.json'));
-  const daysAgo = Date.now() - (DAYS_TO_DELETE * 24 * 60 * 60 * 1000);
-  files.forEach(file => {
-    const filePath = path.join(__dirname, file);
+  const filePath = path.join(__dirname, `${symbol}_price_history.json`);
+  if (fs.existsSync(filePath)) {
+    const daysAgo = Date.now() - (DAYS_TO_DELETE * 24 * 60 * 60 * 1000);
     const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     const filteredData = data.filter(entry => entry.date >= daysAgo);
     fs.writeFileSync(filePath, JSON.stringify(filteredData, null, 2));
-    console.log(`deleted old entries from ${file} (${DAYS_TO_DELETE} days)`);
-  });
+    console.log(`deleted old entries from ${symbol} (${DAYS_TO_DELETE} days)`);
+  }
 };
 
 const processAssetPrice = async (asset) => {
@@ -133,7 +132,11 @@ const calculateRSI = (symbol) => {
   return { rsi: rsi.toFixed(2), overbought_or_oversold: overboughtOrOversold };
 };
 
+const processAsset = async (asset) => {
+  deleteOldEntries(asset.symbol);
+  await processAssetPrice(asset);
+  calculateRSI(asset.symbol);
+};
+
 // run w/ cron job
-deleteOldEntries();
-ASSET_LIST.forEach(processAssetPrice);
-ASSET_LIST.forEach(asset => calculateRSI(asset.symbol));
+ASSET_LIST.forEach(processAsset);
