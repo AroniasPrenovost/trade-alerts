@@ -7,8 +7,8 @@ const path = require('path');
 const TAX_RATE = process.env.TAX_RATE; // 24
 
 const ASSET_LIST = [
-  { symbol: 'AVAX', high: 29, low: 22, entry: 25.48 },
-  // { symbol: 'DOT', high: 5.50, low: 3, entry: 4.08 },
+  { symbol: 'AVAX', high: 29, low: 22, entry: 25.48, shares: 8 },
+  // { symbol: 'DOT', high: 5.50, low: 3, entry: 4.08, shares: 20 },
 ];
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
@@ -143,20 +143,23 @@ const deleteOldEntries = (symbol) => {
 };
 
 const getAndProcessAssetPriceAndNotify = async (asset) => {
-  const assetData = await fetchCurrentAssetData(asset.symbol);
-  if (assetData !== null) {
+  const currentData = await fetchCurrentAssetData(asset.symbol);
+  if (currentData !== null) {
 
-    const price = Number(assetData.quote.USD.price ?? 0);
-    const volume_24h = Number(assetData.quote.USD.volume_24h ?? 0);
-    const volume_change_24h = Number(assetData.quote.USD.volume_change_24h ?? 0);
-    const percent_change_1h = Number(assetData.quote.USD.percent_change_1h ?? 0);
-    const percent_change_24h = Number(assetData.quote.USD.percent_change_24h ?? 0);
-    const percent_change_7d = Number(assetData.quote.USD.percent_change_7d ?? 0);
-    const percent_change_30d = Number(assetData.quote.USD.percent_change_30d ?? 0);
-    const percent_change_60d = Number(assetData.quote.USD.percent_change_60d ?? 0);
-    const percent_change_90d = Number(assetData.quote.USD.percent_change_90d ?? 0);
-    const market_cap = Number(assetData.quote.USD.market_cap ?? 0);
-    // console.log({assetData, price})
+    const price = Number(currentData.quote.USD.price ?? 0);
+    const volume_24h = Number(currentData.quote.USD.volume_24h ?? 0);
+    const volume_change_24h = Number(currentData.quote.USD.volume_change_24h ?? 0);
+    const percent_change_1h = Number(currentData.quote.USD.percent_change_1h ?? 0);
+    const percent_change_24h = Number(currentData.quote.USD.percent_change_24h ?? 0);
+    const percent_change_7d = Number(currentData.quote.USD.percent_change_7d ?? 0);
+    const percent_change_30d = Number(currentData.quote.USD.percent_change_30d ?? 0);
+    const percent_change_60d = Number(currentData.quote.USD.percent_change_60d ?? 0);
+    const percent_change_90d = Number(currentData.quote.USD.percent_change_90d ?? 0);
+    const market_cap = Number(currentData.quote.USD.market_cap ?? 0);
+    // console.log({currentData, price})
+
+    const potentialProfit = calculatePotentialProfit(asset.entry, price, TAX_RATE, asset.shares);
+    console.log(`Potential profit for ${asset.symbol} if sold now: $${potentialProfit.toFixed(2)}`);
 
     if (price > asset.high) {
       sendTradeNotification(asset, price, 'sell');
@@ -244,6 +247,13 @@ const calculateEMA = (symbol, period = 14) => {
   }
   // console.log(`EMA for ${symbol} over ${period} days: ${ema.toFixed(2)}`);
   return ema.toFixed(2);
+};
+
+const calculatePotentialProfit = (entryPrice, currentPrice, taxRate, shares) => {
+  const grossProfitPerShare = currentPrice - entryPrice;
+  const totalGrossProfit = grossProfitPerShare * shares;
+  const netProfit = totalGrossProfit - (totalGrossProfit * (taxRate / 100));
+  return netProfit;
 };
 
 // main loop
