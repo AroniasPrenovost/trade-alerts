@@ -132,6 +132,7 @@ const calculateRSI = (symbol) => {
   return { rsi: rsi.toFixed(2), overbought_or_oversold: overboughtOrOversold };
 };
 
+// simple moving average
 const calculateSMA = (symbol, period = 14) => {
   const data = getFileContents(symbol);
   if (data.length < period) {
@@ -147,6 +148,7 @@ const calculateSMA = (symbol, period = 14) => {
   return sma.toFixed(2);
 };
 
+// exponentional moving average
 const calculateEMA = (symbol, period = 14) => {
   const data = getFileContents(symbol);
   if (data.length < period) {
