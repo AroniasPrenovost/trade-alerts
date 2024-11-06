@@ -142,8 +142,8 @@ const deleteOldEntries = (symbol) => {
   }
 };
 
-const getAndProcessAssetPriceData = async (asset) => {
-  const currentData = await fetchCurrentAssetData(asset.symbol);
+const getAndProcessAssetPriceData = async (symbol) => {
+  const currentData = await fetchCurrentAssetData(symbol);
   if (currentData !== null) {
 
     const price = Number(currentData.quote.USD.price ?? 0);
@@ -159,7 +159,7 @@ const getAndProcessAssetPriceData = async (asset) => {
     // console.log({currentData, price})
 
     return {
-      symbol: asset.symbol,
+      symbol,
       price,
       volume_24h,
       volume_change_24h,
@@ -239,26 +239,26 @@ const calculateEMA = (symbol, period = 14) => {
   return ema.toFixed(2);
 };
 
-const calculatePotentialProfit = (entryPrice, currentPrice, taxRate, shares) => {
+const calculateCurrentProfit = (entryPrice, currentPrice, taxRate, shares) => {
   const grossProfitPerShare = currentPrice - entryPrice;
   const totalGrossProfit = grossProfitPerShare * shares;
-  const potentialTaxOwed = totalGrossProfit * (taxRate / 100);
-  const potentialNetProfit = totalGrossProfit - potentialTaxOwed;
-  return { potentialNetProfit, potentialTaxOwed };
+  const currentTaxOwed = totalGrossProfit * (taxRate / 100);
+  const currentNetProfit = totalGrossProfit - currentTaxOwed;
+  return { currentNetProfit, currentTaxOwed };
 };
 
 const calculateProfitAtSellLimit = (entryPrice, sellLimitPrice, taxRate, shares) => {
   const grossProfitPerShare = sellLimitPrice - entryPrice;
   const totalGrossProfit = grossProfitPerShare * shares;
-  const taxOwed = totalGrossProfit * (taxRate / 100);
-  const netProfit = totalGrossProfit - taxOwed;
-  return { netProfitAtSellLimit, taxOwed };
+  const sellLimitTaxOwed = totalGrossProfit * (taxRate / 100);
+  const sellLimitNetProfit = totalGrossProfit - sellLimitTaxOwed;
+  return { sellLimitNetProfit, sellLimitTaxOwed };
 };
 
 // main loop
 const processAsset = async (asset) => {
   deleteOldEntries(asset.symbol);
-  const newAssetData = await getAndProcessAssetPriceData(asset);
+  const newAssetData = await getAndProcessAssetPriceData(asset.symbol);
   appendToFile(asset.symbol, newAssetData
     //   {
     //   symbol: asset.symbol,
@@ -276,8 +276,8 @@ const processAsset = async (asset) => {
     // }
   );
 
-  const { potentialNetProfit, potentialTaxOwed } = calculatePotentialProfit(asset.entry, newAssetData.price, TAX_RATE, asset.shares);
-  // const { netProfit: sellLimitNetProfit, taxOwed: sellLimitTaxOwed } = calculateProfitAtSellLimit(asset.entry, asset.sellLimit, TAX_RATE, asset.shares);
+  const { currentNetProfit, currentTaxOwed } = calculateCurrentProfit(asset.entry, newAssetData.price, TAX_RATE, asset.shares);
+  const { sellLimitNetProfit, sellLimitTaxOwed } = calculateProfitAtSellLimit(asset.entry, asset.sellLimit, TAX_RATE, asset.shares);
 
   console.log({
     symbol: asset.symbol,
@@ -290,10 +290,10 @@ const processAsset = async (asset) => {
       entryPrice: asset.entry,
       sharesHeld: asset.shares,
       taxRatePercentage: TAX_RATE,
-      potentialNetProfit: potentialNetProfit,
-      potentialTaxOwed: potentialTaxOwed,
-      // sellLimitNetProfit: sellLimitNetProfit,
-      // sellLimitTaxOwed: sellLimitTaxOwed,
+      currentNetProfit: currentNetProfit,
+      currentTaxOwed: currentTaxOwed,
+      sellLimitNetProfit: sellLimitNetProfit,
+      sellLimitTaxOwed: sellLimitTaxOwed,
     },
   });
 

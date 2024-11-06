@@ -404,5 +404,47 @@
     "percent_change_90d": 18.99249802,
     "market_cap": 10656391381.19175,
     "date": 1730910989118
+  },
+  {
+    "symbol": "AVAX",
+    "price": 26.51665089070066,
+    "volume_24h": 556541812.5383916,
+    "volume_change_24h": 89.9702,
+    "percent_change_1h": 0.52152901,
+    "percent_change_24h": 9.24221221,
+    "percent_change_7d": 0.83126444,
+    "percent_change_30d": -2.55572458,
+    "percent_change_60d": 21.5546351,
+    "percent_change_90d": 21.69948332,
+    "market_cap": 10796677727.851067,
+    "date": 1730918913211
+  },
+  {
+    "symbol": "AVAX",
+    "price": 26.510235281329432,
+    "volume_24h": 557423575.1306375,
+    "volume_change_24h": 90.3717,
+    "percent_change_1h": 0.57452331,
+    "percent_change_24h": 9.28190354,
+    "percent_change_7d": 0.87398645,
+    "percent_change_30d": -2.3231268,
+    "percent_change_60d": 21.45845534,
+    "percent_change_90d": 21.68857082,
+    "market_cap": 10794065510.07536,
+    "date": 1730919047675
+  },
+  {
+    "symbol": "AVAX",
+    "price": 26.495585528142637,
+    "volume_24h": 557417385.4758399,
+    "volume_change_24h": 90.3277,
+    "percent_change_1h": 0.60215673,
+    "percent_change_24h": 9.37270773,
+    "percent_change_7d": 0.99010448,
+    "percent_change_30d": -1.96954061,
+    "percent_change_60d": 21.32369156,
+    "percent_change_90d": 21.68734959,
+    "market_cap": 10788100629.193443,
+    "date": 1730919100221
   }
 ]
