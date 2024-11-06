@@ -4,26 +4,17 @@ const Mailjet = require('node-mailjet');
 const fs = require('fs');
 const path = require('path');
 
-// Your CoinMarketCap API key stored in .env file
-const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
+// dotenv.config();
 
-// crypto symbols we want to watch
+const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
 const ASSET_LIST = [
-  {
-    symbol: 'AVAX',
-    high: 29,
-    low: 22,
-  },
-  {
-    symbol: 'DOT',
-    high: 10,
-    low: 3,
-  }
+  { symbol: 'AVAX', high: 29, low: 22 },
+  { symbol: 'DOT', high: 10, low: 3 },
 ];
 
 const mailjet = Mailjet.apiConnect(
   process.env.MAILJET_API_KEY,
-  process.env.MAILJET_SECRET_KEY,
+  process.env.MAILJET_SECRET_KEY
 );
 
 const MAILJET_FROM_EMAIL = process.env.MAILJET_FROM_EMAIL;
@@ -31,44 +22,32 @@ const MAILJET_FROM_NAME = process.env.MAILJET_FROM_NAME;
 const MAILJET_TO_EMAIL = process.env.MAILJET_TO_EMAIL;
 const MAILJET_TO_NAME = process.env.MAILJET_TO_NAME;
 
-function sendTradeNotification(asset, price, buy_or_sell) {
-  const subject = `Trade Recommendation: ${buy_or_sell.toUpperCase()} ${asset.symbol}`;
-  const textPart = `Trade Recommendation: ${buy_or_sell.toUpperCase()} ${asset.symbol} at ${price}.`;
-  const htmlPart = `<h3>${asset.symbol} - ${buy_or_sell.toUpperCase()}</h3>
-  <h4>current price: ${price}</h4>
-  <p>LOW: ${asset.low}</p>
-  <p>HIGH: ${asset.high}.</p>`;
+const sendTradeNotification = (asset, price, action) => {
+  const subject = `Trade Recommendation: ${action.toUpperCase()} ${asset.symbol}`;
+  const textPart = `Trade Recommendation: ${action.toUpperCase()} ${asset.symbol} at ${price}.`;
+  const htmlPart = `<h3>${asset.symbol} - ${action.toUpperCase()}</h3>
+    <h4>current price: ${price}</h4>
+    <p>LOW: ${asset.low}</p>
+    <p>HIGH: ${asset.high}.</p>`;
 
   mailjet
     .post('send', { version: 'v3.1' })
     .request({
       Messages: [
         {
-          From: {
-            Email: MAILJET_FROM_EMAIL,
-            Name: MAILJET_FROM_NAME,
-          },
-          To: [
-            {
-              Email: MAILJET_TO_EMAIL,
-              Name: MAILJET_TO_NAME,
-            }
-          ],
+          From: { Email: MAILJET_FROM_EMAIL, Name: MAILJET_FROM_NAME },
+          To: [{ Email: MAILJET_TO_EMAIL, Name: MAILJET_TO_NAME }],
           Subject: subject,
           TextPart: textPart,
-          HTMLPart: htmlPart
-        }
-      ]
+          HTMLPart: htmlPart,
+        },
+      ],
     })
-    .then((result) => {
-      console.log(`ALERT SENT: ${result.body.Messages[0].To[0].Email} - ${new Date()}`);
-    })
-    .catch((err) => {
-      console.log(err.statusCode);
-    });
-}
+    .then((result) => console.log(`ALERT SENT: ${result.body.Messages[0].To[0].Email} - ${new Date()}`))
+    .catch((err) => console.log(err.statusCode));
+};
 
-async function fetchCurrentPriceData(symbol) {
+const fetchCurrentPriceData = async (symbol) => {
   const LATEST_PRICE_API_URL = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest';
   try {
     const response = await axios.get(LATEST_PRICE_API_URL, {
@@ -76,69 +55,50 @@ async function fetchCurrentPriceData(symbol) {
         'X-CMC_PRO_API_KEY': COINMARKETCAP_API_KEY,
         'Accept': 'application/json',
       },
-      params: {
-        symbol: symbol,
-      },
+      params: { symbol },
     });
-
-    const price = response.data.data[symbol].quote.USD.price ?? 0;
-    return Number(price);
+    return Number(response.data.data[symbol].quote.USD.price ?? 0);
   } catch (error) {
     console.error('Error fetching latest data:', error);
     return null;
   }
-}
+};
 
-async function getAssetPrice(list) {
-  const date = new Date();
-  console.log(date)
-  for (const asset of list) {
-    console.log(asset);
-    const price = await fetchCurrentPriceData(asset.symbol);
-    if (price !== null) {
-      if (price > asset.high) {
-        console.log('price is above support', price)
-        sendTradeNotification(asset, price, 'sell');
-      } else if (price < asset.low) {
-        console.log('price is below support', price)
-        sendTradeNotification(asset, price, 'buy');
-      } else {
-        // sendTradeNotification(asset, price, 'hold');
-        console.log('price is between high and low', price)
-      }
-      appendToFile(asset.symbol, { symbol: asset.symbol, price, date: Date.now() });
+const processAssetPrice = async (asset) => {
+  const price = await fetchCurrentPriceData(asset.symbol);
+  if (price !== null) {
+    if (price > asset.high) {
+      sendTradeNotification(asset, price, 'sell');
+    } else if (price < asset.low) {
+      sendTradeNotification(asset, price, 'buy');
+    } else {
+      console.log('price is between high and low', price);
     }
+    appendToFile(asset.symbol, { symbol: asset.symbol, price, date: Date.now() });
   }
-}
+};
 
-// Append JSON data to a file
-function appendToFile(symbol, data) {
+const appendToFile = (symbol, data) => {
   const filePath = path.join(__dirname, `${symbol}_price_history.json`);
-  let fileData = [];
-
-  if (fs.existsSync(filePath)) {
-    fileData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-  }
-
+  const fileData = fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : [];
   fileData.push(data);
   fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
-}
+};
 
-// Delete old price entries
-function deleteOldEntries() {
+const deleteOldEntries = () => {
+  const DAYS_TO_DELETE = 30; // Set this to '14' or '30' as needed
   const files = fs.readdirSync(__dirname).filter(file => file.endsWith('_price_history.json'));
-  const fourteenDaysAgo = Date.now() - (14 * 24 * 60 * 60 * 1000);
+  const daysAgo = Date.now() - (DAYS_TO_DELETE * 24 * 60 * 60 * 1000);
   files.forEach(file => {
     const filePath = path.join(__dirname, file);
     const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    const filteredData = data.filter(entry => entry.date >= fourteenDaysAgo);
+    const filteredData = data.filter(entry => entry.date >= daysAgo);
     fs.writeFileSync(filePath, JSON.stringify(filteredData, null, 2));
-    console.log(`deleted 14 day-old entries from ${filePath}`);
+    console.log(`deleted old entries from ${file} (${DAYS_TO_DELETE} days)`);
   });
-}
+};
 
-// Calculate RSI
-function calculateRSI(symbol) {
+const calculateRSI = (symbol) => {
   const filePath = path.join(__dirname, `${symbol}_price_history.json`);
   if (!fs.existsSync(filePath)) {
     console.log(`No data available for ${symbol}`);
@@ -154,48 +114,28 @@ function calculateRSI(symbol) {
     return;
   }
 
-  let gains = 0;
-  let losses = 0;
-
-  for (let i = 1; i < recentData.length; i++) {
-    const change = recentData[i].price - recentData[i - 1].price;
+  const { gains, losses } = recentData.slice(1).reduce((acc, entry, i) => {
+    const change = entry.price - recentData[i].price;
     if (change > 0) {
-      gains += change;
+      acc.gains += change;
     } else {
-      losses -= change;
+      acc.losses -= change;
     }
-  }
+    return acc;
+  }, { gains: 0, losses: 0 });
 
   const averageGain = gains / recentData.length;
   const averageLoss = losses / recentData.length;
   const rs = averageGain / averageLoss;
   const rsi = 100 - (100 / (1 + rs));
 
-  let overboughtOrOversold = null;
-  if (rsi > 70) {
-    overboughtOrOversold = 'overbought';
-  } else if (rsi < 55 && rsi > 45) {
-    overboughtOrOversold = 'neutral';
-  } else if (rsi < 30) {
-    overboughtOrOversold = 'oversold';
-  }
+  const overboughtOrOversold = rsi > 70 ? 'overbought' : rsi < 30 ? 'oversold' : 'neutral';
 
-  const result = {
-    rsi: rsi.toFixed(2),
-    overbought_or_oversold: overboughtOrOversold
-  };
+  console.log(`RSI for ${symbol}: ${rsi.toFixed(2)}, Status: ${overboughtOrOversold}`);
+  return { rsi: rsi.toFixed(2), overbought_or_oversold: overboughtOrOversold };
+};
 
-  console.log(`RSI for ${symbol}: ${result.rsi}, Status: ${result.overbought_or_oversold}`);
-  return result;
-}
-
-//
-// Check every X timeframe (ran via cron job)
-//
+// run w/ cron job
 deleteOldEntries();
-
-getAssetPrice(ASSET_LIST);
-
+ASSET_LIST.forEach(processAssetPrice);
 ASSET_LIST.forEach(asset => calculateRSI(asset.symbol));
-
-console.log(' ');
