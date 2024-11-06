@@ -308,12 +308,16 @@ const processAsset = async (asset) => {
       entryPrice: asset.entry,
       sharesHeld: asset.shares,
       taxRatePercentage: TAX_RATE,
-      currentNetProfit: `$${currentNetProfit.toFixed(2)}`,
-      currentTaxOwed: `$${currentTaxOwed}`,
-      currentRealizedProfitsPercentage: `${Number(currentRealizedProfitsPercentage.toFixed(2))}%`,
-      sellLimitNetProfit: `$${sellLimitNetProfit.toFixed(2)}`,
-      sellLimitTaxOwed: `$${sellLimitTaxOwed}`,
-      sellLimitRealizedProfitsPercentage: `${Number(sellLimitRealizedProfitsPercentage.toFixed(2))}%`,
+      current: {
+        netProfit: `$${currentNetProfit.toFixed(2)}`,
+        taxOwed: `$${currentTaxOwed}`,
+        realizedProfitsPercentage: `${Number(currentRealizedProfitsPercentage.toFixed(2))}%`,
+      },
+      sellLimit: {
+        netProfit: `$${sellLimitNetProfit.toFixed(2)}`,
+        taxOwed: `$${sellLimitTaxOwed}`,
+        realizedProfitsPercentage: `${Number(sellLimitRealizedProfitsPercentage.toFixed(2))}%`,
+      },
     },
   });
 
