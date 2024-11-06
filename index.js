@@ -97,7 +97,11 @@ const getAndProcessAssetPriceAndAlert = async (asset) => {
     } else {
       console.log('price is between high and low', price);
     }
-    appendToFile(asset.symbol, { symbol: asset.symbol, price, date: Date.now() });
+    appendToFile(asset.symbol, {
+      symbol: asset.symbol,
+      price,
+      date: Date.now(),
+    });
   }
 };
 
