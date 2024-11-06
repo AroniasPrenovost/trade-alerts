@@ -335,14 +335,8 @@ const processAsset = async (asset) => {
 
   const BUY_SIGNAL = currentPrice < asset.low_resistance;
 
-  if (SELL_SIGNAL) {
-    sendTradeNotification(asset, currentPrice, 'sell');
-  }
-
-  if (BUY_SIGNAL) {
-    sendTradeNotification(asset, currentPrice, 'buy');
-  }
-
+  if (SELL_SIGNAL) sendTradeNotification(asset, currentPrice, 'sell');
+  if (BUY_SIGNAL) sendTradeNotification(asset, currentPrice, 'buy');
   if (!SELL_SIGNAL && !BUY_SIGNAL) {
     // console.log('price is between high and low', price);
   }
