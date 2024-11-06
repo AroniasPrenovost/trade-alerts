@@ -4,7 +4,7 @@ const Mailjet = require('node-mailjet');
 const fs = require('fs');
 const path = require('path');
 
-const TAX_RATE = process.env.TAX_RATE; // 24
+const TAX_RATE = Number(process.env.TAX_RATE); // 24
 
 const ASSET_LIST = [
   { symbol: 'AVAX', high: 29, low: 22, entry: 25.48, shares: 8 },
@@ -142,7 +142,7 @@ const deleteOldEntries = (symbol) => {
   }
 };
 
-const getAndProcessAssetPriceAndNotify = async (asset) => {
+const getAndProcessAssetPriceData = async (asset) => {
   const currentData = await fetchCurrentAssetData(asset.symbol);
   if (currentData !== null) {
 
@@ -158,17 +158,7 @@ const getAndProcessAssetPriceAndNotify = async (asset) => {
     const market_cap = Number(currentData.quote.USD.market_cap ?? 0);
     // console.log({currentData, price})
 
-    const potentialProfit = calculatePotentialProfit(asset.entry, price, TAX_RATE, asset.shares);
-    console.log(`Potential profit for ${asset.symbol} if sold now: $${potentialProfit.toFixed(2)}`);
-
-    if (price > asset.high) {
-      sendTradeNotification(asset, price, 'sell');
-    } else if (price < asset.low) {
-      sendTradeNotification(asset, price, 'buy');
-    } else {
-      console.log('price is between high and low', price);
-    }
-    appendToFile(asset.symbol, {
+    return {
       symbol: asset.symbol,
       price,
       volume_24h,
@@ -181,7 +171,7 @@ const getAndProcessAssetPriceAndNotify = async (asset) => {
       percent_change_90d,
       market_cap,
       date: Date.now(),
-    });
+    };
   }
 };
 
@@ -259,9 +249,40 @@ const calculatePotentialProfit = (entryPrice, currentPrice, taxRate, shares) => 
 // main loop
 const processAsset = async (asset) => {
   deleteOldEntries(asset.symbol);
-  await getAndProcessAssetPriceAndNotify(asset);
+  const d = await getAndProcessAssetPriceData(asset);
+
+
+  appendToFile(asset.symbol, d
+    //   {
+    //   symbol: asset.symbol,
+    //   price,
+    //   volume_24h,
+    //   volume_change_24h,
+    //   percent_change_1h,
+    //   percent_change_24h,
+    //   percent_change_7d,
+    //   percent_change_30d,
+    //   percent_change_60d,
+    //   percent_change_90d,
+    //   market_cap,
+    //   date: Date.now(),
+    // }
+  );
+
+  if (d.price > asset.high) {
+    sendTradeNotification(asset, price, 'sell');
+  } else if (d.price < asset.low) {
+    sendTradeNotification(asset, price, 'buy');
+  } else {
+    // console.log('price is between high and low', price);
+  }
+
   console.log({
     symbol: asset.symbol,
+    price: d.price,
+    sharesHeld: asset.shares,
+    taxRate: TAX_RATE,
+    potentialProfit: calculatePotentialProfit(asset.entry, d.price, TAX_RATE, asset.shares),
     // custom indicators
     rsi: calculateRSI(asset.symbol),
     sma: calculateSMA(asset.symbol),
