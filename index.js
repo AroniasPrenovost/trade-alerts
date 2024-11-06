@@ -251,8 +251,6 @@ const calculatePotentialProfit = (entryPrice, currentPrice, taxRate, shares) => 
 const processAsset = async (asset) => {
   deleteOldEntries(asset.symbol);
   const newAssetData = await getAndProcessAssetPriceData(asset);
-
-
   appendToFile(asset.symbol, newAssetData
     //   {
     //   symbol: asset.symbol,
@@ -270,14 +268,6 @@ const processAsset = async (asset) => {
     // }
   );
 
-  if (newAssetData.price > asset.high) {
-    sendTradeNotification(asset, price, 'sell');
-  } else if (newAssetData.price < asset.low) {
-    sendTradeNotification(asset, price, 'buy');
-  } else {
-    // console.log('price is between high and low', price);
-  }
-
   const { netProfit, taxOwed } = calculatePotentialProfit(asset.entry, newAssetData.price, TAX_RATE, asset.shares);
 
   console.log({
@@ -294,7 +284,16 @@ const processAsset = async (asset) => {
       potentialNetProfit: netProfit,
       potentialTaxOwed: taxOwed,
     },
-  })
+  });
+
+  // send alerts 
+  if (newAssetData.price > asset.high) {
+    sendTradeNotification(asset, price, 'sell');
+  } else if (newAssetData.price < asset.low) {
+    sendTradeNotification(asset, price, 'buy');
+  } else {
+    // console.log('price is between high and low', price);
+  }
 };
 
 ASSET_LIST.forEach(processAsset);
