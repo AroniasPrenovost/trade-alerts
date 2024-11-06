@@ -7,10 +7,10 @@ const path = require('path');
 const TAX_RATE = Number(process.env.TAX_RATE); // 24
 
 const ASSET_LIST = [
-  { symbol: 'AVAX', high: 29, low: 22, entry: 25.49, sellLimit: 29, shares: 3.99870057 },
-  { symbol: 'DOT', high: 5.50, low: 3, entry: 3.873, sellLimit: 4.8, shares: 12.99331849 },
-  { symbol: 'UNI', high: 10.0, low: 8, entry: 0, sellLimit: 0, shares: 0 },
-  { symbol: 'ADA', high: .35, low: .33, entry: .33, sellLimit: .36, shares: 1 },
+  { symbol: 'AVAX', high_resistance: 29, low_resistance: 22, entry: 25.49, sellLimit: 29, shares: 3.99870057 },
+  { symbol: 'DOT', high_resistance: 5.50, low_resistance: 3, entry: 3.873, sellLimit: 4.8, shares: 12.99331849 },
+  { symbol: 'UNI', high_resistance: 10.0, low_resistance: 8, entry: 0, sellLimit: 0, shares: 0 },
+  { symbol: 'ADA', high_resistance: .35, low_resistance: .33, entry: .33, sellLimit: .36, shares: 1 },
 ];
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
@@ -30,8 +30,9 @@ const sendTradeNotification = (asset, price, action) => {
   const textPart = `Trade Recommendation: ${action.toUpperCase()} ${asset.symbol} at ${price}.`;
   const htmlPart = `<h3>${asset.symbol} - ${action.toUpperCase()}</h3>
     <h4>current price: ${price}</h4>
-    <p>LOW: ${asset.low}</p>
-    <p>HIGH: ${asset.high}.</p>`;
+    <p>High Resistance: ${asset.high_resistance}.</p>
+    <p>LOW: ${asset.low_resistance}</p>`
+    ;
 
   mailjet
     .post('send', { version: 'v3.1' })
@@ -303,6 +304,8 @@ const processAsset = async (asset) => {
   console.log({
     symbol: asset.symbol,
     price: currentPrice,
+    high_resistance: asset.high_resistance,
+    low_resistance: asset.low_resistance,
     // custom indicators
     rsi: calculateRSI(asset.symbol),
     sma: calculateSMA(asset.symbol),
@@ -327,10 +330,10 @@ const processAsset = async (asset) => {
   });
 
   // alerts
-  if (currentPrice > asset.high) {
+  if (currentPrice > asset.high_resistance) {
     sendTradeNotification(asset, currentPrice, 'sell');
     console.log(' ');
-  } else if (currentPrice < asset.low) {
+  } else if (currentPrice < asset.low_resistance) {
     sendTradeNotification(asset, currentPrice, 'buy');
     console.log(' ');
   } else {
