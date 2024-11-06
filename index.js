@@ -242,8 +242,9 @@ const calculateEMA = (symbol, period = 14) => {
 const calculatePotentialProfit = (entryPrice, currentPrice, taxRate, shares) => {
   const grossProfitPerShare = currentPrice - entryPrice;
   const totalGrossProfit = grossProfitPerShare * shares;
-  const netProfit = totalGrossProfit - (totalGrossProfit * (taxRate / 100));
-  return netProfit;
+  const taxOwed = totalGrossProfit * (taxRate / 100);
+  const netProfit = totalGrossProfit - taxOwed;
+  return { netProfit, taxOwed };
 };
 
 // main loop
@@ -277,16 +278,22 @@ const processAsset = async (asset) => {
     // console.log('price is between high and low', price);
   }
 
+  const { netProfit, taxOwed } = calculatePotentialProfit(asset.entry, d.price, TAX_RATE, asset.shares);
+
   console.log({
     symbol: asset.symbol,
     price: d.price,
-    sharesHeld: asset.shares,
-    taxRate: TAX_RATE,
-    potentialProfit: calculatePotentialProfit(asset.entry, d.price, TAX_RATE, asset.shares),
     // custom indicators
     rsi: calculateRSI(asset.symbol),
     sma: calculateSMA(asset.symbol),
     ema: calculateEMA(asset.symbol),
+    portfolio: {
+      entryPrice: asset.entry,
+      sharesHeld: asset.shares,
+      taxRate: TAX_RATE,
+      potentialNetProfit: netProfit,
+      potentialTaxOwed: taxOwed,
+    },
   })
 };
 
