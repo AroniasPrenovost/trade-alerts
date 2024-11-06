@@ -311,7 +311,7 @@ const processAsset = async (asset) => {
       entryPrice: asset.entry,
       sharesHeld: asset.shares,
       taxRatePercentage: TAX_RATE,
-      ifISoldNow: {
+      sellNow: {
         netProfit: `$${currentNetProfit.toFixed(2)}`,
         taxOwed: `$${currentTaxOwed.toFixed(2)}`,
         realizedProfit: `$${(currentNetProfit - currentTaxOwed).toFixed(2)}`,
