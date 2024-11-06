@@ -5,8 +5,8 @@ const fs = require('fs');
 const path = require('path');
 
 const ASSET_LIST = [
-  { symbol: 'AVAX', high: 29, low: 22, },
-  // { symbol: 'DOT', high: 5.50, low: 3 },
+  { symbol: 'AVAX', high: 29, low: 22, entry: 25.48 },
+  // { symbol: 'DOT', high: 5.50, low: 3, entry: 4.08 },
 ];
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
@@ -145,8 +145,16 @@ const getAndProcessAssetPriceAndNotify = async (asset) => {
   if (assetData !== null) {
 
     const price = Number(assetData.quote.USD.price ?? 0);
-
-    console.log({assetData, price})
+    const volume_24h = Number(assetData.quote.USD.volume_24h ?? 0);
+    const volume_change_24h = Number(assetData.quote.USD.volume_change_24h ?? 0);
+    const percent_change_1h = Number(assetData.quote.USD.percent_change_1h ?? 0);
+    const percent_change_24h = Number(assetData.quote.USD.percent_change_24h ?? 0);
+    const percent_change_7d = Number(assetData.quote.USD.percent_change_7d ?? 0);
+    const percent_change_30d = Number(assetData.quote.USD.percent_change_30d ?? 0);
+    const percent_change_60d = Number(assetData.quote.USD.percent_change_60d ?? 0);
+    const percent_change_90d = Number(assetData.quote.USD.percent_change_90d ?? 0);
+    const market_cap = Number(assetData.quote.USD.market_cap ?? 0);
+    // console.log({assetData, price})
 
     if (price > asset.high) {
       sendTradeNotification(asset, price, 'sell');
@@ -158,6 +166,15 @@ const getAndProcessAssetPriceAndNotify = async (asset) => {
     appendToFile(asset.symbol, {
       symbol: asset.symbol,
       price,
+      volume_24h,
+      volume_change_24h,
+      percent_change_1h,
+      percent_change_24h,
+      percent_change_7d,
+      percent_change_30d,
+      percent_change_60d,
+      percent_change_90d,
+      market_cap,
       date: Date.now(),
     });
   }

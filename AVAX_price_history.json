@@ -1,67 +1,30 @@
 [
   {
     "symbol": "AVAX",
-    "price": 26.326101761832966,
-    "date": 1730900055836
+    "price": 26.27728195953419,
+    "volume_24h": 564374793.326186,
+    "volume_change_24h": 99.0868,
+    "percent_change_1h": -0.62594826,
+    "percent_change_24h": 9.89404342,
+    "percent_change_7d": 0.81761875,
+    "percent_change_30d": -3.27759926,
+    "percent_change_60d": 19.87591198,
+    "percent_change_90d": 22.5684747,
+    "market_cap": 10699142241.201416,
+    "date": 1730906916543
   },
   {
     "symbol": "AVAX",
-    "price": 26.359762181191865,
-    "date": 1730900320284
-  },
-  {
-    "symbol": "AVAX",
-    "price": 26.38813784339143,
-    "date": 1730900604752
-  },
-  {
-    "symbol": "AVAX",
-    "price": 26.369697548580238,
-    "date": 1730901047393
-  },
-  {
-    "symbol": "AVAX",
-    "price": 26.450367249629334,
-    "date": 1730901302351
-  },
-  {
-    "symbol": "AVAX",
-    "price": 26.499074967598787,
-    "date": 1730901794345
-  },
-  {
-    "symbol": "AVAX",
-    "price": 26.477845590381268,
-    "date": 1730902330043
-  },
-  {
-    "symbol": "AVAX",
-    "price": 26.455143760399707,
-    "date": 1730902639685
-  },
-  {
-    "symbol": "AVAX",
-    "price": 26.510915024756294,
-    "date": 1730902788396
-  },
-  {
-    "symbol": "AVAX",
-    "price": 26.442800206359205,
-    "date": 1730903268146
-  },
-  {
-    "symbol": "AVAX",
-    "price": 26.442800206359205,
-    "date": 1730903375220
-  },
-  {
-    "symbol": "AVAX",
-    "price": 26.5337769619694,
-    "date": 1730903936376
-  },
-  {
-    "symbol": "AVAX",
-    "price": 26.13381375688355,
-    "date": 1730905676058
+    "price": 26.27728195953419,
+    "volume_24h": 564374793.326186,
+    "volume_change_24h": 99.0868,
+    "percent_change_1h": -0.62594826,
+    "percent_change_24h": 9.89404342,
+    "percent_change_7d": 0.81761875,
+    "percent_change_30d": -3.27759926,
+    "percent_change_60d": 19.87591198,
+    "percent_change_90d": 22.5684747,
+    "market_cap": 10699142241.201416,
+    "date": 1730906927098
   }
 ]
