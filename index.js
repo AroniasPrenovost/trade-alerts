@@ -132,11 +132,11 @@ const calculateRSI = (symbol) => {
   return { rsi: rsi.toFixed(2), overbought_or_oversold: overboughtOrOversold };
 };
 
+// main loop
 const processAsset = async (asset) => {
   deleteOldEntries(asset.symbol);
   await processAssetPrice(asset);
   calculateRSI(asset.symbol);
 };
 
-// run w/ cron job
 ASSET_LIST.forEach(processAsset);
