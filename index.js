@@ -250,10 +250,10 @@ const calculatePotentialProfit = (entryPrice, currentPrice, taxRate, shares) => 
 // main loop
 const processAsset = async (asset) => {
   deleteOldEntries(asset.symbol);
-  const d = await getAndProcessAssetPriceData(asset);
+  const newAssetData = await getAndProcessAssetPriceData(asset);
 
 
-  appendToFile(asset.symbol, d
+  appendToFile(asset.symbol, newAssetData
     //   {
     //   symbol: asset.symbol,
     //   price,
@@ -270,19 +270,19 @@ const processAsset = async (asset) => {
     // }
   );
 
-  if (d.price > asset.high) {
+  if (newAssetData.price > asset.high) {
     sendTradeNotification(asset, price, 'sell');
-  } else if (d.price < asset.low) {
+  } else if (newAssetData.price < asset.low) {
     sendTradeNotification(asset, price, 'buy');
   } else {
     // console.log('price is between high and low', price);
   }
 
-  const { netProfit, taxOwed } = calculatePotentialProfit(asset.entry, d.price, TAX_RATE, asset.shares);
+  const { netProfit, taxOwed } = calculatePotentialProfit(asset.entry, newAssetData.price, TAX_RATE, asset.shares);
 
   console.log({
     symbol: asset.symbol,
-    price: d.price,
+    price: newAssetData.price,
     // custom indicators
     rsi: calculateRSI(asset.symbol),
     sma: calculateSMA(asset.symbol),

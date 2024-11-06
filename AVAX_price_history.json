@@ -236,5 +236,19 @@
     "percent_change_90d": 18.82850024,
     "market_cap": 10674430261.010883,
     "date": 1730909397404
+  },
+  {
+    "symbol": "AVAX",
+    "price": 26.214773106360507,
+    "volume_24h": 561477250.4408171,
+    "volume_change_24h": 96.5387,
+    "percent_change_1h": 0.30784216,
+    "percent_change_24h": 9.26109988,
+    "percent_change_7d": 0.18779877,
+    "percent_change_30d": -3.67735825,
+    "percent_change_60d": 19.76582871,
+    "percent_change_90d": 18.79435833,
+    "market_cap": 10673692213.438435,
+    "date": 1730909479736
   }
 ]
