@@ -90,9 +90,9 @@ const SPOT_TAKER_FEE = Number(process.env.SPOT_TAKER_FEE);
 
 const ASSET_LIST = [
   { symbol: 'AVAX', high_resistance: 29, low_resistance: 22, entry: 25.49, sellLimit: 29, shares: 3.99870057 },
-  { symbol: 'DOT', high_resistance: 5.50, low_resistance: 3, entry: 3.873, sellLimit: 4.8, shares: 12.99331849 },
-  { symbol: 'UNI', high_resistance: 10.0, low_resistance: 8, entry: 0, sellLimit: 0, shares: 0 },
-  { symbol: 'ADA', high_resistance: .35, low_resistance: .33, entry: .33, sellLimit: .36, shares: 0 },
+  // { symbol: 'DOT', high_resistance: 5.50, low_resistance: 3, entry: 3.873, sellLimit: 4.8, shares: 12.99331849 },
+  // { symbol: 'UNI', high_resistance: 10.0, low_resistance: 8, entry: 0, sellLimit: 0, shares: 0 },
+  // { symbol: 'ADA', high_resistance: .35, low_resistance: .33, entry: .33, sellLimit: .36, shares: 0 },
 ];
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
@@ -265,23 +265,33 @@ const calculateEMA = (symbol, period = 14) => {
   return ema.toFixed(2);
 };
 
-const calculateCurrentProfit = (entryPrice, currentPrice, shares) => {
-  const grossProfitPerShare = currentPrice - entryPrice;
-  const totalGrossProfit = grossProfitPerShare * shares;
-  const currentTaxOwed = totalGrossProfit * (FEDERAL_TAX_RATE / 100);
-  const currentNetProfit = totalGrossProfit - currentTaxOwed;
-  const currentRealizedProfitPercentage = (grossProfitPerShare / entryPrice) * 100;
-  return { currentNetProfit, currentTaxOwed, currentRealizedProfitPercentage };
-};
+function calculateCurrentProfit(entryPrice, currentPrice, sellPrice, numberOfShares, feeType) {
+    // Calculate the gross profit
+    const profit = (sellPrice - entryPrice) * numberOfShares;
 
-const calculateProfitAtSellLimit = (entryPrice, sellLimitPrice, shares) => {
-  const grossProfitPerShare = sellLimitPrice - entryPrice;
-  const totalGrossProfit = grossProfitPerShare * shares;
-  const sellLimitTaxOwed = totalGrossProfit * (FEDERAL_TAX_RATE / 100);
-  const sellLimitNetProfit = totalGrossProfit - sellLimitTaxOwed;
-  const sellLimitRealizedProfitPercentage = (grossProfitPerShare / entryPrice) * 100;
-  return { sellLimitNetProfit, sellLimitTaxOwed, sellLimitRealizedProfitPercentage };
-};
+    // Determine the exchange fee based on the fee type
+    const exchangeFeeRate = (feeType.toLowerCase() === 'maker') ? SPOT_MAKER_FEE : SPOT_TAKER_FEE;
+    const exchangeFee = (exchangeFeeRate / 100) * sellPrice * numberOfShares;
+
+    // Calculate the tax owed
+    const taxOwed = (FEDERAL_TAX_RATE / 100) * profit;
+
+    // Calculate the net profit after tax and fees
+    const postTaxAndFeesProfit = profit - exchangeFee - taxOwed;
+
+    // Calculate the net profit percentage after tax and fees
+    const investment = entryPrice * numberOfShares;
+    const postTaxAndFeesProfitPercentage = (postTaxAndFeesProfit / investment) * 100;
+
+    // Return the calculated values in an object
+    return {
+        profit,
+        exchangeFee,
+        taxOwed,
+        postTaxAndFeesProfit,
+        postTaxAndFeesProfitPercentage
+    };
+}
 
 
 console.log(' ');
@@ -322,8 +332,9 @@ const processAsset = async (asset) => {
 
   const currentPrice = assetData.price;
 
-  const { currentNetProfit, currentTaxOwed, currentRealizedProfitPercentage } = calculateCurrentProfit(asset.entry, currentPrice, asset.shares);
-  const { sellLimitNetProfit, sellLimitTaxOwed, sellLimitRealizedProfitPercentage } = calculateProfitAtSellLimit(asset.entry, asset.sellLimit, asset.shares);
+  const currentProfitData = calculateCurrentProfit(asset.entry, currentPrice, currentPrice, asset.shares, 'taker');
+  const projectedProfitData = calculateCurrentProfit(asset.entry, currentPrice, asset.sellLimit, asset.shares, 'taker');
+  // console.log({currentProfitData, projectedProfitData});
 
   console.log({
     symbol: asset.symbol,
@@ -334,22 +345,24 @@ const processAsset = async (asset) => {
     rsi: calculateRSI(asset.symbol),
     sma: calculateSMA(asset.symbol),
     ema: calculateEMA(asset.symbol),
-    portfolio: {
-      entryPrice: asset.entry,
-      sharesHeld: asset.shares,
-      taxRatePercentage: FEDERAL_TAX_RATE,
-      sellNow: {
-        profit: `$${currentNetProfit.toFixed(2)}`,
-        taxOwed: `$${currentTaxOwed.toFixed(2)}`,
-        realizedProfit: `$${(currentNetProfit - currentTaxOwed).toFixed(2)}`,
-        realizedProfitPercentage: `${Number(currentRealizedProfitPercentage.toFixed(2))}%`,
-      },
-      sellLimit: {
-        profit: `$${sellLimitNetProfit.toFixed(2)}`,
-        taxOwed: `$${sellLimitTaxOwed.toFixed(2)}`,
-        realizedProfit: `$${(sellLimitNetProfit - sellLimitTaxOwed).toFixed(2)}`,
-        realizedProfitPercentage: `${Number(sellLimitRealizedProfitPercentage.toFixed(2))}%`,
-      },
+    portfolio: { currentProfitData, projectedProfitData,
+      // entryPrice: asset.entry,
+      // sharesHeld: asset.shares,
+      // taxRatePercentage: FEDERAL_TAX_RATE,
+      // sellNow: {
+      //   profit: `$${currentNetProfit.toFixed(2)}`,
+      //   exchangeFee: `$${currentExchangeTakerFee.toFixed(2)}`,
+      //   taxOwed: `$${currentTaxOwed.toFixed(2)}`,
+      //   realizedProfit: `$${(currentNetProfit - currentTaxOwed).toFixed(2)}`,
+      //   realizedProfitPercentage: `${Number(currentRealizedProfitPercentage.toFixed(2))}%`,
+      // },
+      // sellLimit: {
+      //   profit: `$${sellLimitNetProfit.toFixed(2)}`,
+      //   exchangeFee: `$${sellLimitExchangeTakerFee.toFixed(2)}`,
+      //   taxOwed: `$${sellLimitTaxOwed.toFixed(2)}`,
+      //   realizedProfit: `$${(sellLimitNetProfit - sellLimitTaxOwed).toFixed(2)}`,
+      //   realizedProfitPercentage: `${Number(sellLimitRealizedProfitPercentage.toFixed(2))}%`,
+      // },
     },
   });
 
