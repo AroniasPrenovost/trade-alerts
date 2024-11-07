@@ -265,19 +265,19 @@ const calculateEMA = (symbol, period = 14) => {
   return ema.toFixed(2);
 };
 
-const calculateCurrentProfit = (entryPrice, currentPrice, taxRate, shares) => {
+const calculateCurrentProfit = (entryPrice, currentPrice, shares) => {
   const grossProfitPerShare = currentPrice - entryPrice;
   const totalGrossProfit = grossProfitPerShare * shares;
-  const currentTaxOwed = totalGrossProfit * (taxRate / 100);
+  const currentTaxOwed = totalGrossProfit * (FEDERAL_TAX_RATE / 100);
   const currentNetProfit = totalGrossProfit - currentTaxOwed;
   const currentRealizedProfitPercentage = (grossProfitPerShare / entryPrice) * 100;
   return { currentNetProfit, currentTaxOwed, currentRealizedProfitPercentage };
 };
 
-const calculateProfitAtSellLimit = (entryPrice, sellLimitPrice, taxRate, shares) => {
+const calculateProfitAtSellLimit = (entryPrice, sellLimitPrice, shares) => {
   const grossProfitPerShare = sellLimitPrice - entryPrice;
   const totalGrossProfit = grossProfitPerShare * shares;
-  const sellLimitTaxOwed = totalGrossProfit * (taxRate / 100);
+  const sellLimitTaxOwed = totalGrossProfit * (FEDERAL_TAX_RATE / 100);
   const sellLimitNetProfit = totalGrossProfit - sellLimitTaxOwed;
   const sellLimitRealizedProfitPercentage = (grossProfitPerShare / entryPrice) * 100;
   return { sellLimitNetProfit, sellLimitTaxOwed, sellLimitRealizedProfitPercentage };
@@ -322,8 +322,8 @@ const processAsset = async (asset) => {
 
   const currentPrice = assetData.price;
 
-  const { currentNetProfit, currentTaxOwed, currentRealizedProfitPercentage } = calculateCurrentProfit(asset.entry, currentPrice, FEDERAL_TAX_RATE, asset.shares);
-  const { sellLimitNetProfit, sellLimitTaxOwed, sellLimitRealizedProfitPercentage } = calculateProfitAtSellLimit(asset.entry, asset.sellLimit, FEDERAL_TAX_RATE, asset.shares);
+  const { currentNetProfit, currentTaxOwed, currentRealizedProfitPercentage } = calculateCurrentProfit(asset.entry, currentPrice, asset.shares);
+  const { sellLimitNetProfit, sellLimitTaxOwed, sellLimitRealizedProfitPercentage } = calculateProfitAtSellLimit(asset.entry, asset.sellLimit, asset.shares);
 
   console.log({
     symbol: asset.symbol,
