@@ -84,7 +84,8 @@ const sendTradeNotification = (asset, price, action) => {
 // stock/crypto data
 //
 
-const TAX_RATE = Number(process.env.TAX_RATE);
+
+const FEDERAL_TAX_RATE = Number(process.env.FEDERAL_TAX_RATE);
 
 const ASSET_LIST = [
   { symbol: 'AVAX', high_resistance: 29, low_resistance: 22, entry: 25.49, sellLimit: 29, shares: 3.99870057 },
@@ -288,7 +289,10 @@ console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
 console.log(' ** ** ** ** SWING TRADER * ** ** ** ** ** ** **');
 console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
 console.log(' ');
+const xx = new Date().toString();
+console.log(xx);
 console.log(' ');
+console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
 
 // main loop
 const processAsset = async (asset) => {
@@ -317,8 +321,8 @@ const processAsset = async (asset) => {
 
   const currentPrice = assetData.price;
 
-  const { currentNetProfit, currentTaxOwed, currentRealizedProfitPercentage } = calculateCurrentProfit(asset.entry, currentPrice, TAX_RATE, asset.shares);
-  const { sellLimitNetProfit, sellLimitTaxOwed, sellLimitRealizedProfitPercentage } = calculateProfitAtSellLimit(asset.entry, asset.sellLimit, TAX_RATE, asset.shares);
+  const { currentNetProfit, currentTaxOwed, currentRealizedProfitPercentage } = calculateCurrentProfit(asset.entry, currentPrice, FEDERAL_TAX_RATE, asset.shares);
+  const { sellLimitNetProfit, sellLimitTaxOwed, sellLimitRealizedProfitPercentage } = calculateProfitAtSellLimit(asset.entry, asset.sellLimit, FEDERAL_TAX_RATE, asset.shares);
 
   console.log({
     symbol: asset.symbol,
@@ -332,7 +336,7 @@ const processAsset = async (asset) => {
     portfolio: {
       entryPrice: asset.entry,
       sharesHeld: asset.shares,
-      taxRatePercentage: TAX_RATE,
+      taxRatePercentage: FEDERAL_TAX_RATE,
       sellNow: {
         profit: `$${currentNetProfit.toFixed(2)}`,
         taxOwed: `$${currentTaxOwed.toFixed(2)}`,
