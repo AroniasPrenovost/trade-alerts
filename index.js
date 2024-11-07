@@ -84,8 +84,9 @@ const sendTradeNotification = (asset, price, action) => {
 // stock/crypto data
 //
 
-
 const FEDERAL_TAX_RATE = Number(process.env.FEDERAL_TAX_RATE);
+const SPOT_MAKER_FEE = Number(process.env.SPOT_MAKER_FEE);
+const SPOT_TAKER_FEE = Number(process.env.SPOT_TAKER_FEE);
 
 const ASSET_LIST = [
   { symbol: 'AVAX', high_resistance: 29, low_resistance: 22, entry: 25.49, sellLimit: 29, shares: 3.99870057 },
