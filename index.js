@@ -4,16 +4,45 @@ const Mailjet = require('node-mailjet');
 const fs = require('fs');
 const path = require('path');
 
-const TAX_RATE = Number(process.env.TAX_RATE);
+//
+// file management
+//
 
-const ASSET_LIST = [
-  { symbol: 'AVAX', high_resistance: 29, low_resistance: 22, entry: 25.49, sellLimit: 29, shares: 3.99870057 },
-  { symbol: 'DOT', high_resistance: 5.50, low_resistance: 3, entry: 3.873, sellLimit: 4.8, shares: 12.99331849 },
-  { symbol: 'UNI', high_resistance: 10.0, low_resistance: 8, entry: 0, sellLimit: 0, shares: 0 },
-  { symbol: 'ADA', high_resistance: .35, low_resistance: .33, entry: .33, sellLimit: .36, shares: 0 },
-];
+const dataDirectory = path.join(__dirname, 'data');
 
-const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
+// Ensure the data directory exists
+if (!fs.existsSync(dataDirectory)) {
+  fs.mkdirSync(dataDirectory);
+}
+
+const appendToFile = (data) => {
+  const symbol = data.symbol;
+  const filePath = path.join(dataDirectory, `${symbol}_price_history.json`);
+  const fileData = getFileContents(symbol);
+  fileData.push(data);
+  fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
+};
+
+const getFileContents = (symbol) => {
+  const filePath = path.join(dataDirectory, `${symbol}_price_history.json`);
+  return fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : [];
+};
+
+const deleteOldEntries = (symbol) => {
+  const DAYS_TO_DELETE = 30; // Set this to '14' or '30' as needed
+  const filePath = path.join(dataDirectory, `${symbol}_price_history.json`);
+  if (fs.existsSync(filePath)) {
+    const daysAgo = Date.now() - (DAYS_TO_DELETE * 24 * 60 * 60 * 1000);
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const filteredData = data.filter(entry => entry.date >= daysAgo);
+    fs.writeFileSync(filePath, JSON.stringify(filteredData, null, 2));
+    console.log(`deleted old entries from ${symbol} (${DAYS_TO_DELETE} days)`);
+  }
+};
+
+//
+// email notifications
+//
 
 const mailjet = Mailjet.apiConnect(
  process.env.MAILJET_API_KEY,
@@ -50,6 +79,21 @@ const sendTradeNotification = (asset, price, action) => {
     .then((result) => console.log(`ALERT: ${result.body.Messages[0].To[0].Email} - ${new Date()}`))
     .catch((err) => console.log(err.statusCode));
 };
+
+//
+// stock/crypto data
+//
+
+const TAX_RATE = Number(process.env.TAX_RATE);
+
+const ASSET_LIST = [
+  { symbol: 'AVAX', high_resistance: 29, low_resistance: 22, entry: 25.49, sellLimit: 29, shares: 3.99870057 },
+  { symbol: 'DOT', high_resistance: 5.50, low_resistance: 3, entry: 3.873, sellLimit: 4.8, shares: 12.99331849 },
+  { symbol: 'UNI', high_resistance: 10.0, low_resistance: 8, entry: 0, sellLimit: 0, shares: 0 },
+  { symbol: 'ADA', high_resistance: .35, low_resistance: .33, entry: .33, sellLimit: .36, shares: 0 },
+];
+
+const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
 
 const fetchCurrentAssetData = async (symbol) => {
   const LATEST_PRICE_API_URL = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest';
@@ -119,31 +163,6 @@ const fetchCurrentAssetData = async (symbol) => {
     console.error('Error fetching latest data:', error);
     console.log('symbol: ', symbol);
     return null;
-  }
-};
-
-const appendToFile = (data) => {
-  const symbol = data.symbol;
-  const filePath = path.join(__dirname, `${symbol}_price_history.json`);
-  const fileData = getFileContents(symbol);
-  fileData.push(data);
-  fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
-};
-
-const getFileContents = (symbol) => {
-  const filePath = path.join(__dirname, `${symbol}_price_history.json`);
-  return fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : [];
-};
-
-const deleteOldEntries = (symbol) => {
-  const DAYS_TO_DELETE = 30; // Set this to '14' or '30' as needed
-  const filePath = path.join(__dirname, `${symbol}_price_history.json`);
-  if (fs.existsSync(filePath)) {
-    const daysAgo = Date.now() - (DAYS_TO_DELETE * 24 * 60 * 60 * 1000);
-    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    const filteredData = data.filter(entry => entry.date >= daysAgo);
-    fs.writeFileSync(filePath, JSON.stringify(filteredData, null, 2));
-    console.log(`deleted old entries from ${symbol} (${DAYS_TO_DELETE} days)`);
   }
 };
 

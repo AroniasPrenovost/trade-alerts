@@ -2,4 +2,4 @@
 
 /node_modules
 
-*_price_history.json
+/data
