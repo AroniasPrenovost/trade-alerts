@@ -40,6 +40,12 @@ This project is a Node.js application that monitors cryptocurrency prices using 
    node index.js
    ```
 
+5. Or run locally at intervals (1 hour shown below) with:
+
+  ```bash
+  while sleep 3600; do node index; done;
+  ```
+
 ## Configuration
 
 - The cryptocurrencies to monitor and their respective high/low thresholds are defined in the `assets_to_watch` array within the code. You can modify this array to add or remove cryptocurrencies or adjust the thresholds.
