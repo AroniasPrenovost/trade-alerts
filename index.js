@@ -265,7 +265,7 @@ const calculateEMA = (symbol, period = 14) => {
   return ema.toFixed(2);
 };
 
-function calculateCurrentProfit(entryPrice, sellPrice, numberOfShares, feeType) {
+function calculateTradeProfit(entryPrice, sellPrice, numberOfShares, feeType) {
     // Calculate the gross profit
     const profit = (sellPrice - entryPrice) * numberOfShares;
 
@@ -330,9 +330,9 @@ const processAsset = async (asset) => {
 
   const currentPrice = assetData.price;
 
-  const currentProfitData = calculateCurrentProfit(asset.entry, currentPrice, asset.shares, 'taker');
-  const projectedProfitData = calculateCurrentProfit(asset.entry, asset.sellLimit, asset.shares, 'taker');
-  const testingProfitData = calculateCurrentProfit(1, 25.54, 2, 'taker');
+  const currentProfitData = calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker');
+  const projectedProfitData = calculateTradeProfit(asset.entry, asset.sellLimit, asset.shares, 'taker');
+  const testingProfitData = calculateTradeProfit(1, 25.54, 2, 'taker');
   // console.log({currentProfitData, projectedProfitData});
 
   console.log({
