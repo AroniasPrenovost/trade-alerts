@@ -4,7 +4,7 @@ const Mailjet = require('node-mailjet');
 const fs = require('fs');
 const path = require('path');
 
-const TAX_RATE = Number(process.env.TAX_RATE); // 24
+const TAX_RATE = 24; // Number(process.env.TAX_RATE);
 
 const ASSET_LIST = [
   { symbol: 'AVAX', high_resistance: 29, low_resistance: 22, entry: 25.49, sellLimit: 29, shares: 3.99870057 },
@@ -13,17 +13,17 @@ const ASSET_LIST = [
   { symbol: 'ADA', high_resistance: .35, low_resistance: .33, entry: .33, sellLimit: .36, shares: 0 },
 ];
 
-const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
+const COINMARKETCAP_API_KEY = 'a57a764a-406b-48e6-8f09-6638930d6cfb'; // process.env.COINMARKETCAP_API_KEY;
 
 const mailjet = Mailjet.apiConnect(
-  process.env.MAILJET_API_KEY,
-  process.env.MAILJET_SECRET_KEY
+ '0df82e3e2a965ff697394e3d69e94d76', //  process.env.MAILJET_API_KEY,
+  'b094de99c3e4654f20b05fb1f619d1ba', // process.env.MAILJET_SECRET_KEY
 );
 
-const MAILJET_FROM_EMAIL = process.env.MAILJET_FROM_EMAIL;
-const MAILJET_FROM_NAME = process.env.MAILJET_FROM_NAME;
-const MAILJET_TO_EMAIL = process.env.MAILJET_TO_EMAIL;
-const MAILJET_TO_NAME = process.env.MAILJET_TO_NAME;
+const MAILJET_FROM_EMAIL = 'aronprenovostmktg@gmail.com'; // process.env.MAILJET_FROM_EMAIL;
+const MAILJET_FROM_NAME = 'trade-notifier'; // process.env.MAILJET_FROM_NAME;
+const MAILJET_TO_EMAIL = 'aronprenovostmktg@gmail.com'; // process.env.MAILJET_TO_EMAIL;
+const MAILJET_TO_NAME = 'aron-prenovost'; // process.env.MAILJET_TO_NAME;
 
 const sendTradeNotification = (asset, price, action) => {
   const subject = `Trade Recommendation: ${action.toUpperCase()} ${asset.symbol}`;
@@ -315,13 +315,13 @@ const processAsset = async (asset) => {
       sharesHeld: asset.shares,
       taxRatePercentage: TAX_RATE,
       sellNow: {
-        netProfit: `$${currentNetProfit.toFixed(2)}`,
+        profit: `$${currentNetProfit.toFixed(2)}`,
         taxOwed: `$${currentTaxOwed.toFixed(2)}`,
         realizedProfit: `$${(currentNetProfit - currentTaxOwed).toFixed(2)}`,
         realizedProfitPercentage: `${Number(currentRealizedProfitPercentage.toFixed(2))}%`,
       },
       sellLimit: {
-        netProfit: `$${sellLimitNetProfit.toFixed(2)}`,
+        profit: `$${sellLimitNetProfit.toFixed(2)}`,
         taxOwed: `$${sellLimitTaxOwed.toFixed(2)}`,
         realizedProfit: `$${(sellLimitNetProfit - sellLimitTaxOwed).toFixed(2)}`,
         realizedProfitPercentage: `${Number(sellLimitRealizedProfitPercentage.toFixed(2))}%`,
@@ -337,9 +337,10 @@ const processAsset = async (asset) => {
 
   if (SELL_SIGNAL) sendTradeNotification(asset, currentPrice, 'sell');
   if (BUY_SIGNAL) sendTradeNotification(asset, currentPrice, 'buy');
-  if (!SELL_SIGNAL && !BUY_SIGNAL) {
-    // console.log('price is between high and low', price);
-  }
+
+  // if (!SELL_SIGNAL && !BUY_SIGNAL) {
+    // console.log('price is between high and low', currentPrice);
+  // }
 
   console.log('__________________________');
   console.log(' ');
