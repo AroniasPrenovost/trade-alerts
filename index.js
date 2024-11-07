@@ -311,8 +311,7 @@ const processAsset = async (asset) => {
   deleteOldEntries(asset.symbol);
 
   const assetData = await getAndProcessAssetPriceData(asset.symbol);
-  /*
-      {
+  /* {
         symbol: asset.symbol,
         price,
         volume_24h,
@@ -325,8 +324,7 @@ const processAsset = async (asset) => {
         percent_change_90d,
         market_cap,
         date: Date.now(),
-      }
-  */
+  } */
 
   appendToFile(assetData);
 
@@ -334,6 +332,7 @@ const processAsset = async (asset) => {
 
   const currentProfitData = calculateCurrentProfit(asset.entry, currentPrice, currentPrice, asset.shares, 'taker');
   const projectedProfitData = calculateCurrentProfit(asset.entry, currentPrice, asset.sellLimit, asset.shares, 'taker');
+  const testingProfitData = calculateCurrentProfit(1, 25.54, 25, 2, 'taker');
   // console.log({currentProfitData, projectedProfitData});
 
   console.log({
@@ -345,24 +344,10 @@ const processAsset = async (asset) => {
     rsi: calculateRSI(asset.symbol),
     sma: calculateSMA(asset.symbol),
     ema: calculateEMA(asset.symbol),
-    portfolio: { currentProfitData, projectedProfitData,
-      // entryPrice: asset.entry,
-      // sharesHeld: asset.shares,
-      // taxRatePercentage: FEDERAL_TAX_RATE,
-      // sellNow: {
-      //   profit: `$${currentNetProfit.toFixed(2)}`,
-      //   exchangeFee: `$${currentExchangeTakerFee.toFixed(2)}`,
-      //   taxOwed: `$${currentTaxOwed.toFixed(2)}`,
-      //   realizedProfit: `$${(currentNetProfit - currentTaxOwed).toFixed(2)}`,
-      //   realizedProfitPercentage: `${Number(currentRealizedProfitPercentage.toFixed(2))}%`,
-      // },
-      // sellLimit: {
-      //   profit: `$${sellLimitNetProfit.toFixed(2)}`,
-      //   exchangeFee: `$${sellLimitExchangeTakerFee.toFixed(2)}`,
-      //   taxOwed: `$${sellLimitTaxOwed.toFixed(2)}`,
-      //   realizedProfit: `$${(sellLimitNetProfit - sellLimitTaxOwed).toFixed(2)}`,
-      //   realizedProfitPercentage: `${Number(sellLimitRealizedProfitPercentage.toFixed(2))}%`,
-      // },
+    portfolio: {
+      currentProfitData,
+      projectedProfitData,
+      testingProfitData
     },
   });
 
