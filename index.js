@@ -360,44 +360,55 @@ const processAsset = async (asset) => {
 
   deleteOldEntries(asset.symbol);
 
+  //
+  // get and save the data
+  //
+
   const assetData = await getAndProcessAssetPriceData(asset.symbol);
-  /* {
-        symbol: asset.symbol,
-        price,
-        volume_24h,
-        volume_change_24h,
-        percent_change_1h,
-        percent_change_24h,
-        percent_change_7d,
-        percent_change_30d,
-        percent_change_60d,
-        percent_change_90d,
-        market_cap,
-        date: Date.now(),
-  } */
+    /* {
+          symbol: asset.symbol,
+          price,
+          volume_24h,
+          volume_change_24h,
+          percent_change_1h,
+          percent_change_24h,
+          percent_change_7d,
+          percent_change_30d,
+          percent_change_60d,
+          percent_change_90d,
+          market_cap,
+          date: Date.now(),
+    } */
 
   appendToFile(assetData);
 
-  const currentPrice = assetData.price;
-  const totalTransactionCost = calculateTransactionCost(asset.entry, asset.shares, 'taker');
+  //
+  // log the data
+  //
 
-  const sellNow = calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker');
-  const sellAtLimit = calculateTradeProfit(asset.entry, asset.sell_limit, asset.shares, 'taker');
-  // const testingProfitData = calculateTradeProfit(1, 25.54, 2, 'taker');
-  // console.log({sellNow, sellAtLimit});
-  // console.log({buy, sell})
-  // return;
+  const currentPrice = assetData.price;
 
   const position = asset.shares > 0 ? {
     entry_price: asset.entry,
     shares: asset.shares,
     federal_tax_rate: FEDERAL_TAX_RATE,
-    total_transaction_cost: totalTransactionCost,
-    sellNow,
-    sellAtLimit,
-    // testingProfitData,
+    total_transaction_cost: calculateTransactionCost(asset.entry, asset.shares, 'taker'),
+    sell_now: calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker'),
+    sell_at_limit: calculateTradeProfit(asset.entry, asset.sell_limit, asset.shares, 'taker'),
   } : null;
 
+
+  const possible_position =
+    asset.__dummy_shares !== 0 && asset.__dummy_entry !== 0
+    ?
+    {
+      entry_price: asset.__dummy_entry,
+      shares: asset.__dummy_shares,
+      federal_tax_rate: FEDERAL_TAX_RATE,
+      total_transaction_cost: calculateTransactionCost(asset.dummy_entry, asset.__dummy_shares, 'taker'),
+      sell_now: calculateTradeProfit(asset.__dummy_entry, currentPrice, asset.__dummy_shares, 'taker'),
+      sell_at_limit: calculateTradeProfit(asset.__dummy_entry, asset.__dummy_sell_limit, asset.__dummy_shares, 'taker'),
+  } : null;
 
 
   console.log({
@@ -411,9 +422,13 @@ const processAsset = async (asset) => {
     sma: calculateSMA(asset.symbol),
     ema: calculateEMA(asset.symbol),
     position,
+    possible_position,
   });
 
+  //
   // alerts
+  //
+
   const SELL_SIGNAL = asset.shares > 0
     && currentPrice > asset.resistance;
 
