@@ -34,13 +34,15 @@ This project is a Node.js application that monitors cryptocurrency prices using 
 
 3. Create a `.env` file in the root directory and configure your environment variables. Use `.env.sample` as a reference.
 
-4. Start the application:
+4. Create a `config.json` file in the root directory and configure your watchlist. Use `example-config.json` as a reference.
+
+5. Start the application:
 
    ```bash
    node index.js
    ```
 
-5. Or run locally at intervals (1 hour shown below) with:
+6. Or run locally at intervals (1 hour shown below) with:
 
   ```bash
   while sleep 3600; do node index; done;
