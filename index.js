@@ -59,8 +59,8 @@ const sendTradeNotification = (asset, price, action) => {
   const textPart = `Trade Recommendation: ${action.toUpperCase()} ${asset.symbol} at ${price}.`;
   const htmlPart = `<h3>${asset.symbol} - ${action.toUpperCase()}</h3>
     <h4>current price: ${price}</h4>
-    <p>High Resistance: ${asset.high_resistance}.</p>
-    <p>LOW: ${asset.low_resistance}</p>`
+    <p>High Resistance: ${asset.resistance}.</p>
+    <p>LOW: ${asset.support}</p>`
     ;
 
   mailjet
@@ -89,10 +89,10 @@ const SPOT_MAKER_FEE = Number(process.env.SPOT_MAKER_FEE);
 const SPOT_TAKER_FEE = Number(process.env.SPOT_TAKER_FEE);
 
 const ASSET_LIST = [
-  { symbol: 'AVAX', high_resistance: 29, low_resistance: 22, entry: 25.49, sellLimit: 29, shares: 3.99870057 },
-  // { symbol: 'DOT', high_resistance: 5.50, low_resistance: 3, entry: 3.873, sellLimit: 4.8, shares: 12.99331849 },
-  // { symbol: 'UNI', high_resistance: 10.0, low_resistance: 8, entry: 0, sellLimit: 0, shares: 0 },
-  // { symbol: 'ADA', high_resistance: .35, low_resistance: .33, entry: .33, sellLimit: .36, shares: 0 },
+  { symbol: 'AVAX', resistance: 29, support: 22, entry: 25.49, sellLimit: 29, shares: 3.99870057 },
+  // { symbol: 'DOT', resistance: 5.50, support: 3, entry: 3.873, sellLimit: 4.8, shares: 12.99331849 },
+  // { symbol: 'UNI', resistance: 10.0, support: 8, entry: 0, sellLimit: 0, shares: 0 },
+  // { symbol: 'ADA', resistance: .35, support: .33, entry: .33, sellLimit: .36, shares: 0 },
 ];
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
@@ -358,8 +358,8 @@ const processAsset = async (asset) => {
   console.log({
     symbol: asset.symbol,
     price: currentPrice,
-    high_resistance: asset.high_resistance,
-    low_resistance: asset.low_resistance,
+    resistance: asset.resistance,
+    support: asset.support,
     // custom indicators
     rsi: calculateRSI(asset.symbol),
     sma: calculateSMA(asset.symbol),
@@ -377,9 +377,9 @@ const processAsset = async (asset) => {
 
   // alerts
   const SELL_SIGNAL = asset.shares > 0
-    && currentPrice > asset.high_resistance;
+    && currentPrice > asset.resistance;
 
-  const BUY_SIGNAL = currentPrice < asset.low_resistance;
+  const BUY_SIGNAL = currentPrice < asset.support;
 
   if (SELL_SIGNAL) sendTradeNotification(asset, currentPrice, 'sell');
   if (BUY_SIGNAL) sendTradeNotification(asset, currentPrice, 'buy');
