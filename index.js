@@ -334,6 +334,7 @@ const xx = new Date().toString();
 console.log(xx);
 console.log(' ');
 console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
+console.log(' ');
 
 // main loop
 const processAsset = async (asset) => {
