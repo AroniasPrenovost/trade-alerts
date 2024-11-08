@@ -386,9 +386,9 @@ const processAsset = async (asset) => {
       shares: asset.shares,
       federalTaxRate: FEDERAL_TAX_RATE,
       purchaseTransactionCost: `$${purchaseTransactionCost.toFixed(2)}`,
-        sellNow,
-        sellAtLimit,
-        // testingProfitData,
+      sellNow,
+      sellAtLimit,
+      // testingProfitData,
     },
   });
 
