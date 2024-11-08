@@ -293,6 +293,16 @@ function calculateTradeProfit(entryPrice, sellPrice, numberOfShares, feeType) {
     };
 }
 
+function calculatePurchasePrice(entryPrice, numberOfShares) {
+  if (numberOfShares === 0) return null;
+  // Calculate the total cost without fees
+  const totalCostWithoutFees = entryPrice * numberOfShares;
+  // Calculate the taker fee
+  const takerFee = (SPOT_TAKER_FEE / 100) * totalCostWithoutFees;
+  // Calculate the final purchase price including the maker fee
+  const finalPurchasePrice = totalCostWithoutFees + takerFee;
+  return finalPurchasePrice;
+}
 
 console.log(' ');
 console.log(' ');
@@ -330,10 +340,20 @@ const processAsset = async (asset) => {
 
   const currentPrice = assetData.price;
 
-  const currentProfitData = calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker');
-  const projectedProfitData = calculateTradeProfit(asset.entry, asset.sellLimit, asset.shares, 'taker');
-  const testingProfitData = calculateTradeProfit(1, 25.54, 2, 'taker');
-  // console.log({currentProfitData, projectedProfitData});
+  const sellNowProfit = calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker');
+  const projectedProfit = calculateTradeProfit(asset.entry, asset.sellLimit, asset.shares, 'taker');
+  // const testingProfitData = calculateTradeProfit(1, 25.54, 2, 'taker');
+  // console.log({sellNowProfit, projectedProfit});
+
+
+//   const buy = calculateTradeProfit(asset.entry, 27.54, asset.shares, 'maker');
+//   const sell = calculateTradeProfit(asset.entry, 27.54, asset.shares, 'taker');
+//   // const taxOwed = (SPOT_MAKER_FEE / 100) * profit;
+//
+//
+//
+
+
 
   console.log({
     symbol: asset.symbol,
@@ -347,10 +367,11 @@ const processAsset = async (asset) => {
     portfolio: {
       entryPrice: asset.entry,
       shares: asset.shares,
-      taxRate: FEDERAL_TAX_RATE,
-      currentProfitData,
-      projectedProfitData,
-      testingProfitData,
+      purchase: calculatePurchasePrice(asset.entry, asset.shares),
+      federalTaxRate: FEDERAL_TAX_RATE,
+      sellNowProfit,
+      projectedProfit,
+      // testingProfitData,
     },
   });
 
