@@ -346,8 +346,8 @@ const processAsset = async (asset) => {
   // console.log({sellNowProfit, projectedProfit});
 
 
-  // const buy = calculateTradeProfit(asset.entry, 27.54, asset.shares, 'maker');
-  // const sell = calculateTradeProfit(asset.entry, 27.54, asset.shares, 'taker');
+  const buy = calculateTradeProfit(asset.entry, 27.54, asset.shares, 'maker');
+  const sell = calculateTradeProfit(asset.entry, 27.54, asset.shares, 'taker');
   // console.log({buy, sell})
   // return;
 
@@ -386,7 +386,7 @@ const processAsset = async (asset) => {
     // console.log('price is between high and low', currentPrice);
   // }
 
-  console.log('__________________________\n);
+  console.log('__________________________\n');
 };
 
 ASSET_LIST.forEach(processAsset);
