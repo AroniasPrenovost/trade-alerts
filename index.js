@@ -386,8 +386,7 @@ const processAsset = async (asset) => {
     // console.log('price is between high and low', currentPrice);
   // }
 
-  console.log('__________________________');
-  console.log(' ');
+  console.log('__________________________\n);
 };
 
 ASSET_LIST.forEach(processAsset);
