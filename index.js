@@ -328,7 +328,7 @@ console.log(' ** ** ** ** SWING TRADER * ** ** ** ** ** ** **');
 console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
 console.log(' ');
 
-function createDate() {
+function createHumanReadableDateNow() {
   const date = new Date();
   const timeOptions = {
     hour: 'numeric',
@@ -349,7 +349,7 @@ function createDate() {
   return `${formattedDate} ${formattedTime}`;
 }
 
-console.log(createDate());
+console.log(createHumanReadableDateNow());
 
 console.log(' ');
 console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
