@@ -287,20 +287,20 @@ function calculateTradeProfit(entryPrice, sellPrice, numberOfShares, feeType) {
     // Calculate the tax owed
     const taxOwed = (FEDERAL_TAX_RATE / 100) * profit;
 
-    // Calculate the net profit after tax and fees
-    const postTaxAndFeesProfit = profit - exchangeFee - taxOwed;
+    // Calculate profit after tax and fees
+    const grossProfit = profit - exchangeFee - taxOwed;
 
     // Calculate the net profit percentage after tax and fees
     const investment = entryPrice * numberOfShares;
-    const postTaxAndFeesProfitPercentage = (postTaxAndFeesProfit / investment) * 100;
+    const grossProfitPercentage = (grossProfit / investment) * 100;
 
     // Return the calculated values in an object
     return {
         profit,
         exchangeFee,
         taxOwed,
-        postTaxAndFeesProfit,
-        postTaxAndFeesProfitPercentage
+        grossProfit,
+        grossProfitPercentage
     };
 }
 
