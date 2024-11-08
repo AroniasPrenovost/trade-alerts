@@ -315,6 +315,17 @@ function calculateTransactionCost(entryPrice, numberOfShares, feeType) {
   return cost;
 }
 
+function calculatePercentageDifference(num1, num2) {
+    if (num1 === 0 && num2 === 0) {
+        return 0; // If both numbers are zero, the percentage difference is zero.
+    }
+    const difference = Math.abs(num1 - num2);
+    const average = (num1 + num2) / 2;
+    const percentageDifference = (difference / average) * 100;
+    console.log(typeof percentageDifference)
+    return `${percentageDifference.toFixed(2)}%`;
+}
+
 console.log(' ');
 console.log(' ');
 console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
@@ -367,6 +378,7 @@ const processAsset = async (asset) => {
     price: currentPrice,
     support: asset.support,
     resistance: asset.resistance,
+    support_resistance_gap: calculatePercentageDifference(asset.support, asset.resistance),
     // custom indicators
     rsi: calculateRSI(asset.symbol),
     sma: calculateSMA(asset.symbol),
