@@ -89,7 +89,7 @@ const SPOT_MAKER_FEE = Number(process.env.SPOT_MAKER_FEE);
 const SPOT_TAKER_FEE = Number(process.env.SPOT_TAKER_FEE);
 
 const ASSET_LIST = [
-  { symbol: 'AVAX', support: 22, resistance: 29, entry: 25.49, sellLimit: 29, shares: 3.99870057 },
+  { symbol: 'AVAX', support: 22, resistance: 29, entry: 25.49, sellLimit: 29, shares: 0 },
   // { symbol: 'DOT', support: 3, resistance: 5.50, entry: 3.873, sellLimit: 4.8, shares: 12.99331849 },
   // { symbol: 'UNI', support: 8, resistance: 10.0, entry: 0, sellLimit: 0, shares: 0 },
   // { symbol: 'ADA', support: .33, resistance: .35, entry: .33, sellLimit: .36, shares: 0 },
@@ -360,7 +360,7 @@ const processAsset = async (asset) => {
   appendToFile(assetData);
 
   const currentPrice = assetData.price;
-  const purchaseTransactionCost = calculateTransactionCost(asset.entry, asset.shares, 'taker');
+  const purchaseTransactionCost = asset.shares > 0 ? calculateTransactionCost(asset.entry, asset.shares, 'taker') : 0;
 
   const sellNow = calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker');
   const sellAtLimit = calculateTradeProfit(asset.entry, asset.sellLimit, asset.shares, 'taker');
