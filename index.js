@@ -350,7 +350,7 @@ const processAsset = async (asset) => {
   appendToFile(assetData);
 
   const currentPrice = assetData.price;
-  const purchaseCost = calculateTransactionCost(asset.entry, asset.shares, 'taker');
+  const transactionCost = calculateTransactionCost(asset.entry, asset.shares, 'taker');
 
   const sellNowProfit = calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker');
   const projectedProfit = calculateTradeProfit(asset.entry, asset.sellLimit, asset.shares, 'taker');
@@ -378,7 +378,7 @@ const processAsset = async (asset) => {
       entryPrice: asset.entry,
       shares: asset.shares,
       federalTaxRate: FEDERAL_TAX_RATE,
-      purchaseCost,
+      transactionCost,
       sellNowProfit,
       projectedProfit,
       // testingProfitData,
