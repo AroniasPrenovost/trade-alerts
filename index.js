@@ -280,40 +280,40 @@ function calculateTradeProfit(entryPrice, sellPrice, numberOfShares, feeType) {
     const profit = (sellPrice - entryPrice) * numberOfShares;
 
     // Determine the exchange fee based on the fee type
-    const exchangeFee = calculateExchangeFee(sellPrice, numberOfShares, feeType);
+    const exchange_fee = calculateExchangeFee(sellPrice, numberOfShares, feeType);
 
     // Calculate the tax owed
-    const taxOwed = (FEDERAL_TAX_RATE / 100) * profit;
+    const tax_owed = (FEDERAL_TAX_RATE / 100) * profit;
 
     // Calculate profit after tax and fees
-    const grossProfit = profit - exchangeFee - taxOwed;
+    const gross_profit = profit - exchange_fee - tax_owed;
 
     // Calculate the net profit percentage after tax and fees
     const investment = entryPrice * numberOfShares;
-    const grossProfitPercentage = (grossProfit / investment) * 100;
+    const gross_profit_percentage = (gross_profit / investment) * 100;
 
     // Return the calculated values in an object
     return {
         profit,
-        exchangeFee,
-        taxOwed,
-        grossProfit,
-        grossProfitPercentage
+        exchange_fee,
+        tax_owed,
+        gross_profit,
+        gross_profit_percentage
     };
 }
 
 function calculateTransactionCost(entryPrice, numberOfShares, feeType) {
-  if (numberOfShares === 0) return null;
+  if (numberOfShares === 0) return 0;
   // Calculate the total cost without fees
-  const costWithoutFees = entryPrice * numberOfShares;
+  const base_cost = entryPrice * numberOfShares;
   // Calculate the exchange fee
-  const exchangeFee = calculateExchangeFee(entryPrice, numberOfShares, feeType);
+  const exchange_fee = calculateExchangeFee(entryPrice, numberOfShares, feeType);
   // Calculate the final purchase price including fee
-  const cost = costWithoutFees + exchangeFee;
+  const cost = base_cost + exchange_fee;
   return cost;
 }
 
-function calculatePercentageDifference(num1, num2) {
+function calculateTradeRangePercentage(num1, num2) {
   if (num1 === 0 && num2 === 0) return 0;
   const difference = Math.abs(num1 - num2);
   const average = (num1 + num2) / 2;
@@ -379,7 +379,7 @@ const processAsset = async (asset) => {
   appendToFile(assetData);
 
   const currentPrice = assetData.price;
-  const purchaseTransactionCost = asset.shares > 0 ? calculateTransactionCost(asset.entry, asset.shares, 'taker') : 0;
+  const purchaseTransactionCost = calculateTransactionCost(asset.entry, asset.shares, 'taker');
 
   const sellNow = calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker');
   const sellAtLimit = calculateTradeProfit(asset.entry, asset.sellLimit, asset.shares, 'taker');
@@ -396,16 +396,16 @@ const processAsset = async (asset) => {
     price: currentPrice,
     support: asset.support,
     resistance: asset.resistance,
-    support_resistance_gap: calculatePercentageDifference(asset.support, asset.resistance),
+    trade_range_percentage: calculateTradeRangePercentage(asset.support, asset.resistance),
     // custom indicators
     rsi: calculateRSI(asset.symbol),
     sma: calculateSMA(asset.symbol),
     ema: calculateEMA(asset.symbol),
     portfolio: {
-      entryPrice: asset.entry,
+      entry_price: asset.entry,
       shares: asset.shares,
-      federalTaxRate: FEDERAL_TAX_RATE,
-      purchaseTransactionCost: `$${purchaseTransactionCost.toFixed(2)}`,
+      federal_tax_rate: FEDERAL_TAX_RATE,
+      purchase_transaction_cost: `$${purchaseTransactionCost.toFixed(2)}`,
       sellNow,
       sellAtLimit,
       // testingProfitData,
