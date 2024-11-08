@@ -293,7 +293,7 @@ function calculateTradeProfit(entryPrice, sellPrice, numberOfShares, feeType) {
     };
 }
 
-function calculatePurchasePrice(entryPrice, numberOfShares) {
+function calculateTransactionCost(entryPrice, numberOfShares) {
   if (numberOfShares === 0) return null;
   // Calculate the total cost without fees
   const totalCostWithoutFees = entryPrice * numberOfShares;
@@ -339,7 +339,7 @@ const processAsset = async (asset) => {
   appendToFile(assetData);
 
   const currentPrice = assetData.price;
-  const purchasePrice = calculatePurchasePrice(asset.entry, asset.shares);
+  const transactionCost = calculateTransactionCost(asset.entry, asset.shares);
 
   const sellNowProfit = calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker');
   const projectedProfit = calculateTradeProfit(asset.entry, asset.sellLimit, asset.shares, 'taker');
@@ -367,7 +367,7 @@ const processAsset = async (asset) => {
       entryPrice: asset.entry,
       shares: asset.shares,
       federalTaxRate: FEDERAL_TAX_RATE,
-      purchasePrice,
+      transactionCost,
       sellNowProfit,
       projectedProfit,
       // testingProfitData,
