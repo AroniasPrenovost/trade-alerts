@@ -385,7 +385,6 @@ const processAsset = async (asset) => {
   const sellAtLimit = calculateTradeProfit(asset.entry, asset.sellLimit, asset.shares, 'taker');
   // const testingProfitData = calculateTradeProfit(1, 25.54, 2, 'taker');
   // console.log({sellNow, sellAtLimit});
-
   // console.log({buy, sell})
   // return;
 
