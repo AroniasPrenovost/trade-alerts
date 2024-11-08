@@ -382,11 +382,21 @@ const processAsset = async (asset) => {
   const totalTransactionCost = calculateTransactionCost(asset.entry, asset.shares, 'taker');
 
   const sellNow = calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker');
-  const sellAtLimit = calculateTradeProfit(asset.entry, asset.sellLimit, asset.shares, 'taker');
+  const sellAtLimit = calculateTradeProfit(asset.entry, asset.sell_limit, asset.shares, 'taker');
   // const testingProfitData = calculateTradeProfit(1, 25.54, 2, 'taker');
   // console.log({sellNow, sellAtLimit});
   // console.log({buy, sell})
   // return;
+
+  const position = asset.shares > 0 ? {
+    entry_price: asset.entry,
+    shares: asset.shares,
+    federal_tax_rate: FEDERAL_TAX_RATE,
+    total_transaction_cost: totalTransactionCost,
+    sellNow,
+    sellAtLimit,
+    // testingProfitData,
+  } : null;
 
 
 
@@ -400,15 +410,7 @@ const processAsset = async (asset) => {
     rsi: calculateRSI(asset.symbol),
     sma: calculateSMA(asset.symbol),
     ema: calculateEMA(asset.symbol),
-    position: {
-      entry_price: asset.entry,
-      shares: asset.shares,
-      federal_tax_rate: FEDERAL_TAX_RATE,
-      total_transaction_cost: totalTransactionCost,
-      sellNow,
-      sellAtLimit,
-      // testingProfitData,
-    },
+    position,
   });
 
   // alerts
