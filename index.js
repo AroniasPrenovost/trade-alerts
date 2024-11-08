@@ -265,13 +265,24 @@ const calculateEMA = (symbol, period = 14) => {
   return ema.toFixed(2);
 };
 
+
+//
+//
+//
+
+function calculateExchangeFee(price, numberOfShares, feeType) {
+    // Determine the exchange fee rate based on the fee type
+    const feeRate = (feeType.toLowerCase() === 'maker') ? SPOT_MAKER_FEE : SPOT_TAKER_FEE;
+    const fee = (feeRate / 100) * price * numberOfShares;
+    return fee;
+}
+
 function calculateTradeProfit(entryPrice, sellPrice, numberOfShares, feeType) {
     // Calculate the gross profit
     const profit = (sellPrice - entryPrice) * numberOfShares;
 
     // Determine the exchange fee based on the fee type
-    const exchangeFeeRate = (feeType.toLowerCase() === 'maker') ? SPOT_MAKER_FEE : SPOT_TAKER_FEE;
-    const exchangeFee = (exchangeFeeRate / 100) * sellPrice * numberOfShares;
+    const exchangeFee = calculateExchangeFee(sellPrice, numberOfShares, feeType);
 
     // Calculate the tax owed
     const taxOwed = (FEDERAL_TAX_RATE / 100) * profit;
@@ -297,10 +308,9 @@ function calculateTransactionCost(entryPrice, numberOfShares, feeType) {
   if (numberOfShares === 0) return null;
   // Calculate the total cost without fees
   const costWithoutFees = entryPrice * numberOfShares;
-  // Calculate the taker fee
-  const exchangeFeeRate = (feeType.toLowerCase() === 'maker') ? SPOT_MAKER_FEE : SPOT_TAKER_FEE;
-  const exchangeFee = (exchangeFeeRate / 100) * costWithoutFees;
-  // Calculate the final purchase price including the maker fee
+  // Calculate the exchange fee
+  const exchangeFee = calculateExchangeFee(entryPrice, numberOfShares, feeType);
+  // Calculate the final purchase price including fee
   const cost = costWithoutFees + exchangeFee;
   return cost;
 }
