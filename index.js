@@ -293,15 +293,16 @@ function calculateTradeProfit(entryPrice, sellPrice, numberOfShares, feeType) {
     };
 }
 
-function calculateTransactionCost(entryPrice, numberOfShares) {
+function calculateTransactionCost(entryPrice, numberOfShares, feeType) {
   if (numberOfShares === 0) return null;
   // Calculate the total cost without fees
-  const totalCostWithoutFees = entryPrice * numberOfShares;
+  const costWithoutFees = entryPrice * numberOfShares;
   // Calculate the taker fee
-  const takerFee = (SPOT_TAKER_FEE / 100) * totalCostWithoutFees;
+  const exchangeFeeRate = (feeType.toLowerCase() === 'maker') ? SPOT_MAKER_FEE : SPOT_TAKER_FEE;
+  const exchangeFee = (exchangeFeeRate / 100) * costWithoutFees;
   // Calculate the final purchase price including the maker fee
-  const finalPurchasePrice = totalCostWithoutFees + takerFee;
-  return finalPurchasePrice;
+  const cost = costWithoutFees + exchangeFee;
+  return cost;
 }
 
 console.log(' ');
@@ -339,7 +340,7 @@ const processAsset = async (asset) => {
   appendToFile(assetData);
 
   const currentPrice = assetData.price;
-  const transactionCost = calculateTransactionCost(asset.entry, asset.shares);
+  const purchaseCost = calculateTransactionCost(asset.entry, asset.shares, 'taker');
 
   const sellNowProfit = calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker');
   const projectedProfit = calculateTradeProfit(asset.entry, asset.sellLimit, asset.shares, 'taker');
@@ -367,7 +368,7 @@ const processAsset = async (asset) => {
       entryPrice: asset.entry,
       shares: asset.shares,
       federalTaxRate: FEDERAL_TAX_RATE,
-      transactionCost,
+      purchaseCost,
       sellNowProfit,
       projectedProfit,
       // testingProfitData,
