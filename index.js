@@ -400,7 +400,7 @@ const processAsset = async (asset) => {
     rsi: calculateRSI(asset.symbol),
     sma: calculateSMA(asset.symbol),
     ema: calculateEMA(asset.symbol),
-    portfolio: {
+    position: {
       entry_price: asset.entry,
       shares: asset.shares,
       federal_tax_rate: FEDERAL_TAX_RATE,
