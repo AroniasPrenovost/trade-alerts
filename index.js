@@ -90,8 +90,8 @@ const SPOT_TAKER_FEE = Number(process.env.SPOT_TAKER_FEE);
 
 const ASSET_LIST = [
   { symbol: 'AVAX', support: 24, resistance: 29, entry: 25.49, sellLimit: 29, shares: 0 },
-  { symbol: 'DOT', support: 3, resistance: 5.50, entry: 3.873, sellLimit: 4.8, shares: 12.99331849 },
-  { symbol: 'UNI', support: 8, resistance: 10.0, entry: 0, sellLimit: 0, shares: 0 },
+  { symbol: 'DOT', support: 3, resistance: 4.5, entry: 3.873, sellLimit: 4.40, shares: 12.99331849 },
+  { symbol: 'UNI', support: 7.40, resistance: 9.0, entry: 0, sellLimit: 0, shares: 0 },
   // { symbol: 'ADA', support: .33, resistance: .35, entry: .33, sellLimit: .36, shares: 0 },
 ];
 
