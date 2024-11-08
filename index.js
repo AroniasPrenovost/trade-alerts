@@ -346,12 +346,10 @@ const processAsset = async (asset) => {
   // console.log({sellNowProfit, projectedProfit});
 
 
-//   const buy = calculateTradeProfit(asset.entry, 27.54, asset.shares, 'maker');
-//   const sell = calculateTradeProfit(asset.entry, 27.54, asset.shares, 'taker');
-//   // const taxOwed = (SPOT_MAKER_FEE / 100) * profit;
-//
-//
-//
+  // const buy = calculateTradeProfit(asset.entry, 27.54, asset.shares, 'maker');
+  // const sell = calculateTradeProfit(asset.entry, 27.54, asset.shares, 'taker');
+  // console.log({buy, sell})
+  // return;
 
 
 
@@ -367,7 +365,7 @@ const processAsset = async (asset) => {
     portfolio: {
       entryPrice: asset.entry,
       shares: asset.shares,
-      purchase: calculatePurchasePrice(asset.entry, asset.shares),
+      purchasePrice: calculatePurchasePrice(asset.entry, asset.shares),
       federalTaxRate: FEDERAL_TAX_RATE,
       sellNowProfit,
       projectedProfit,
