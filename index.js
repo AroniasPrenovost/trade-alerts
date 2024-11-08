@@ -318,7 +318,6 @@ function calculatePercentageDifference(num1, num2) {
   const difference = Math.abs(num1 - num2);
   const average = (num1 + num2) / 2;
   const percentageDifference = (difference / average) * 100;
-  console.log(typeof percentageDifference)
   return `${percentageDifference.toFixed(2)}%`;
 }
 
