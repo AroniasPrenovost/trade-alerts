@@ -1,5 +1,7 @@
-.env
-
 /node_modules
 
 /data
+
+config.json
+
+.env

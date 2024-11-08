@@ -91,9 +91,9 @@ const SPOT_TAKER_FEE = Number(process.env.SPOT_TAKER_FEE);
 const ASSET_LIST = [
   { symbol: 'AVAX', support: 24, resistance: 29, entry: 24, sellLimit: 29, shares: 0 },
   { symbol: 'DOT', support: 3, resistance: 4.5, entry: 3.873, sellLimit: 4.40, shares: 12.99331849 },
-  // { symbol: 'UNI', support: 7.40, resistance: 9.0, entry: 0, sellLimit: 0, shares: 0 },
-    { symbol: 'CRO', support: .086, resistance: .1, entry: .085, sellLimit: .1, shares: 0 },
-  { symbol: 'ADA', support: .38, resistance: .45, entry: .38, sellLimit: .40, shares: 200 },
+  { symbol: 'UNI', support: 7.40, resistance: 9.0, entry: 0, sellLimit: 0, shares: 0 },
+  { symbol: 'CRO', support: .086, resistance: .1, entry: .085, sellLimit: .1, shares: 0 },
+  { symbol: 'ADA', support: .38, resistance: .45, entry: .38, sellLimit: .40, shares: 0 },
 ];
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
