@@ -365,8 +365,8 @@ const processAsset = async (asset) => {
   console.log({
     symbol: asset.symbol,
     price: currentPrice,
-    resistance: asset.resistance,
     support: asset.support,
+    resistance: asset.resistance,
     // custom indicators
     rsi: calculateRSI(asset.symbol),
     sma: calculateSMA(asset.symbol),
