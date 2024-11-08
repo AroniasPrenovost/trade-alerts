@@ -371,7 +371,7 @@ const processAsset = async (asset) => {
 
 
 
-  const obj = {
+  console.log({
     symbol: asset.symbol,
     price: currentPrice,
     support: asset.support,
@@ -386,15 +386,11 @@ const processAsset = async (asset) => {
       shares: asset.shares,
       federalTaxRate: FEDERAL_TAX_RATE,
       purchaseTransactionCost: `$${purchaseTransactionCost.toFixed(2)}`,
-      profit: {
         sellNow,
         sellAtLimit,
         // testingProfitData,
-      },
     },
-  };
-
-  console.log(JSON.stringify(obj, null, 2));
+  });
 
   // alerts
   const SELL_SIGNAL = asset.shares > 0
