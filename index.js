@@ -459,7 +459,7 @@ const processAsset = async (asset) => {
     // console.log('price is between high and low', currentPrice);
   // }
 
-  console.log('__________________________\n');
+  console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 };
 
 //
