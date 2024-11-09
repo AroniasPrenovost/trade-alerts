@@ -3,6 +3,7 @@ const axios = require('axios');
 const Mailjet = require('node-mailjet');
 const fs = require('fs');
 const path = require('path');
+var cron = require('node-cron');
 
 //
 // file management
@@ -10,8 +11,7 @@ const path = require('path');
 
 const dataDirectory = path.join(__dirname, 'data');
 
-// Ensure the data directory exists
-if (!fs.existsSync(dataDirectory)) {
+if (!fs.existsSync(dataDirectory)) { // Ensure the data directory exists
   fs.mkdirSync(dataDirectory);
 }
 
@@ -28,16 +28,26 @@ const getFileContents = (symbol) => {
   return fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : [];
 };
 
-const deleteOldEntries = (symbol) => {
+const deleteOldEntries = () => {
   const DAYS_TO_DELETE = 30; // Set this to '14' or '30' as needed
-  const filePath = path.join(dataDirectory, `${symbol}_price_history.json`);
-  if (fs.existsSync(filePath)) {
-    const daysAgo = Date.now() - (DAYS_TO_DELETE * 24 * 60 * 60 * 1000);
-    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    const filteredData = data.filter(entry => entry.date >= daysAgo);
-    fs.writeFileSync(filePath, JSON.stringify(filteredData, null, 2));
-    console.log(`deleted old entries from ${symbol} (${DAYS_TO_DELETE} days)`);
-  }
+  const dataDirectory = path.join(__dirname, 'data');
+  const daysAgo = Date.now() - (DAYS_TO_DELETE * 24 * 60 * 60 * 1000);
+  fs.readdir(dataDirectory, (err, files) => {
+    if (err) {
+      console.error('Error reading directory:', err);
+      return;
+    }
+    files.forEach(file => {
+      if (file.endsWith('_price_history.json')) {
+        const filePath = path.join(dataDirectory, file);
+        const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        const filteredData = data.filter(entry => entry.date >= daysAgo);
+        fs.writeFileSync(filePath, JSON.stringify(filteredData, null, 2));
+        console.log(`Deleted old entries from ${file} (${DAYS_TO_DELETE} days)`);
+      }
+    });
+    console.log(' ');
+  });
 };
 
 //
@@ -205,8 +215,9 @@ const calculateRSI = (symbol) => {
   const recentData = data.filter(entry => entry.date >= fourteenDaysAgo);
 
   if (recentData.length < 2) {
-    console.log(`Not enough data to calculate RSI for ${symbol}`);
-    return;
+    return 'Insufficient data';
+    // console.log(`Not enough data to calculate RSI for ${symbol}`);
+    // return;
   }
 
   const { gains, losses } = recentData.slice(1).reduce((acc, entry, i) => {
@@ -234,8 +245,9 @@ const calculateRSI = (symbol) => {
 const calculateSMA = (symbol, period = 14) => {
   const data = getFileContents(symbol);
   if (data.length < period) {
-    console.log(`Not enough data to calculate SMA for ${symbol}`);
-    return;
+    return 'Insufficient data';
+    // console.log(`Not enough data to calculate SMA for ${symbol}`);
+    // return;
   }
 
   const recentData = data.slice(-period);
@@ -249,8 +261,9 @@ const calculateSMA = (symbol, period = 14) => {
 const calculateEMA = (symbol, period = 14) => {
   const data = getFileContents(symbol);
   if (data.length < period) {
-    console.log(`Not enough data to calculate EMA for ${symbol}`);
-    return;
+    return 'Insufficient data';
+    // console.log(`Not enough data to calculate EMA for ${symbol}`);
+    // return;
   }
 
   const k = 2 / (period + 1);
@@ -321,12 +334,9 @@ function calculateTradeRangePercentage(num1, num2) {
   return `${percentageDifference.toFixed(2)}%`;
 }
 
-console.log(' ');
-console.log(' ');
-console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
-console.log(' ** ** ** ** SWING TRADER * ** ** ** ** ** ** **');
-console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
-console.log(' ');
+//
+// random utils
+//
 
 function createHumanReadableDateNow() {
   const date = new Date();
@@ -349,16 +359,24 @@ function createHumanReadableDateNow() {
   return `${formattedDate} ${formattedTime}`;
 }
 
-console.log(createHumanReadableDateNow());
+function showAppTitle() {
+  console.log(' ');
+  console.log(' ');
+  console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
+  console.log(' ** ** ** ** SWING TRADER * ** ** ** ** ** ** **');
+  console.log(' ');
+  console.log(createHumanReadableDateNow());
+  console.log(' ');
+  console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
+  console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
+  console.log(' ');
+}
 
-console.log(' ');
-console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
-console.log(' ');
-
+//
 // main loop
-const processAsset = async (asset) => {
+//
 
-  deleteOldEntries(asset.symbol);
+const processAsset = async (asset) => {
 
   //
   // get and save the data
@@ -444,4 +462,20 @@ const processAsset = async (asset) => {
   console.log('__________________________\n');
 };
 
+//
+// initial run
+//
+
+showAppTitle();
+deleteOldEntries();
 ASSET_LIST.forEach(processAsset);
+
+//
+// repeat every X interval
+//
+
+cron.schedule('0 * * * *', () => { // every 1 hour
+  showAppTitle();
+  deleteOldEntries();
+  ASSET_LIST.forEach(processAsset);
+});
