@@ -475,7 +475,8 @@ ASSET_LIST.forEach(processAsset);
 // repeat every X interval
 //
 
-cron.schedule('0 * * * *', () => { // every 1 hour
+// cron.schedule('0 * * * *', () => { // every 1 hour
+cron.schedule('0 */3 * * *', () => { // every 3 hours
   showAppTitle();
   deleteOldEntries();
   ASSET_LIST.forEach(processAsset);
