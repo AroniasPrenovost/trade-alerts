@@ -450,7 +450,8 @@ const processAsset = async (asset) => {
   const SELL_SIGNAL = asset.shares > 0
     && currentPrice > asset.resistance;
 
-  const BUY_SIGNAL = currentPrice < asset.support;
+  const BUY_SIGNAL = asset.shares === 0
+    && currentPrice < asset.support;
 
   if (SELL_SIGNAL) sendTradeNotification(asset, currentPrice, 'sell');
   if (BUY_SIGNAL) sendTradeNotification(asset, currentPrice, 'buy');
