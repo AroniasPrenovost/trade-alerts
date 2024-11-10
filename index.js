@@ -2,6 +2,11 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+
+//
+// email
+//
+
 const Mailjet = require('node-mailjet');
 
 const mailjet = Mailjet.apiConnect(
@@ -38,6 +43,10 @@ const sendTradeNotification = (asset, price, action) => {
     .then((result) => console.log(`ALERT: ${result.body.Messages[0].To[0].Email} - ${new Date()}`))
     .catch((err) => console.log(err.statusCode));
 };
+
+//
+// data processing utils
+//
 
 const FEDERAL_TAX_RATE = Number(process.env.FEDERAL_TAX_RATE);
 const SPOT_MAKER_FEE = Number(process.env.SPOT_MAKER_FEE);
@@ -139,7 +148,7 @@ function calculateTradeRangePercentage(num1, num2) {
 }
 
 //
-//
+// data processing
 //
 
 const processAsset = async (asset) => {
@@ -186,7 +195,7 @@ const processAsset = async (asset) => {
 };
 
 //
-//
+// mail loop
 //
 
 const main = async () => {
