@@ -247,19 +247,6 @@ function createHumanReadableDateNow() {
   return `${formattedDate} ${formattedTime}`;
 }
 
-function showAppTitle() {
-  console.log(' ');
-  console.log(' ');
-  console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
-  console.log(' ** ** ** ** SWING TRADER * ** ** ** ** ** ** **');
-  console.log(' ');
-  console.log(createHumanReadableDateNow());
-  console.log(' ');
-  console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
-  console.log(' ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **');
-  console.log(' ');
-}
-
 //
 // main loop
 //
@@ -341,15 +328,8 @@ const processAsset = async (asset) => {
   // if (!SELL_SIGNAL && !BUY_SIGNAL) {
     // console.log('price is between high and low', currentPrice);
   // }
-
-  console.log('------------------------------------\n');
 };
 
-//
-// initial run
-//
-
-showAppTitle();
 ASSET_LIST.forEach(processAsset);
 
 /*
