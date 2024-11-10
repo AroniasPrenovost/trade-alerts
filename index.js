@@ -322,6 +322,8 @@ function calculateTransactionCost(entryPrice, numberOfShares, feeType) {
   // Calculate the exchange fee
   const exchange_fee = calculateExchangeFee(entryPrice, numberOfShares, feeType);
   // Calculate the final purchase price including fee
+  console.log('___')
+  console.log({entryPrice, numberOfShares, feeType})
   const cost = base_cost + exchange_fee;
   return cost;
 }
@@ -412,6 +414,7 @@ const processAsset = async (asset) => {
     federal_tax_rate: FEDERAL_TAX_RATE,
     total_transaction_cost: calculateTransactionCost(asset.entry, asset.shares, 'taker'),
     sell_now: calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker'),
+    sell_limit: asset.sell_limit,
     sell_at_limit: calculateTradeProfit(asset.entry, asset.sell_limit, asset.shares, 'taker'),
   } : null;
 
@@ -423,8 +426,9 @@ const processAsset = async (asset) => {
       entry_price: asset.__dummy_entry,
       shares: asset.__dummy_shares,
       federal_tax_rate: FEDERAL_TAX_RATE,
-      total_transaction_cost: calculateTransactionCost(asset.dummy_entry, asset.__dummy_shares, 'taker'),
+      total_transaction_cost: calculateTransactionCost(asset.__dummy_entry, asset.__dummy_shares, 'taker'),
       sell_now: calculateTradeProfit(asset.__dummy_entry, currentPrice, asset.__dummy_shares, 'taker'),
+      sell_limit: asset.__dummy_sell_limit,
       sell_at_limit: calculateTradeProfit(asset.__dummy_entry, asset.__dummy_sell_limit, asset.__dummy_shares, 'taker'),
   } : null;
 
