@@ -36,21 +36,39 @@ This project is a Node.js application that monitors cryptocurrency prices using 
 
 4. Create a `config.json` file in the root directory and configure your watchlist. Use `example-config.json` as a reference.
 
-5. Start the application:
+## Running the Application
+
+You can run the application in two different ways:
+
+1. **Run for all assets:**
 
    ```bash
    node index.js
    ```
 
-6. Or run locally at intervals (1 hour shown below) with:
+2. **Run for a specific asset by symbol:**
 
-  ```bash
-  while sleep 3600; do node index; done;
-  ```
+   ```bash
+   node index.js SYMBOL
+   ```
 
-## Configuration
+   Replace `SYMBOL` with the cryptocurrency symbol you want to monitor.
 
-- The cryptocurrencies to monitor and their respective high/low thresholds are defined in the `assets_to_watch` array within the code. You can modify this array to add or remove cryptocurrencies or adjust the thresholds.
+## Running as a Cron Job on Google Cloud Functions
+
+To run this application as a scheduled task using Google Cloud Functions, you can set up a Cloud Scheduler job that triggers a Cloud Function. Here's a brief overview of the steps:
+
+1. **Deploy the function:**
+
+   Create a new Google Cloud Function that runs the `main` function from `index.js`. Ensure all necessary environment variables are set in the function's configuration.
+
+2. **Set up Cloud Scheduler:**
+
+   Use Google Cloud Scheduler to create a cron job that triggers your Cloud Function at desired intervals (e.g., every hour).
+
+3. **Configure permissions:**
+
+   Ensure that the Cloud Scheduler has the necessary permissions to invoke the Cloud Function.
 
 ## License
 
@@ -64,3 +82,5 @@ Contributions are welcome! Please feel free to submit a pull request or open an 
 
 - [CoinMarketCap API](https://coinmarketcap.com/api/)
 - [Mailjet](https://www.mailjet.com/)
+- [Google Cloud Functions documentation](https://cloud.google.com/functions/docs)
+- [Cloud Scheduler documentation](https://cloud.google.com/scheduler/docs)
