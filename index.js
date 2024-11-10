@@ -8,6 +8,18 @@ const axios = require('axios');
 //
 
 const assets = null;
+/*
+
+const assets = [
+    {
+      ...
+    },
+    {
+      ...
+    },
+];
+
+*/
 
 //
 // email
