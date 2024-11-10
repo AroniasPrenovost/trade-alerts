@@ -38,7 +38,7 @@ const MAILJET_TO_EMAIL = process.env.MAILJET_TO_EMAIL;
 const MAILJET_TO_NAME = process.env.MAILJET_TO_NAME;
 
 const sendTradeNotification = (asset, price, action) => {
-  const subject = `Trade Recommendation: ${action.toUpperCase()} ${asset.symbol}`;
+  const subject = `~ ALERT ~: ${action.toUpperCase()} - ${asset.symbol}`;
   const textPart = `Trade Recommendation: ${action.toUpperCase()} ${asset.symbol} at ${price}.`;
   const htmlPart = `<h3>${asset.symbol} - ${action.toUpperCase()}</h3>
     <h4>current price: ${price}</h4>
@@ -215,6 +215,10 @@ const processAsset = async (asset) => {
 
   if (SELL_SIGNAL) sendTradeNotification(asset, currentPrice, 'sell');
   if (BUY_SIGNAL) sendTradeNotification(asset, currentPrice, 'buy');
+
+  if (currentPrice >= asset.alert_level) {
+    sendTradeNotification(asset, currentPrice, 'alert');
+  }
 };
 
 //
