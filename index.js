@@ -283,7 +283,7 @@ const processAsset = async (asset) => {
   });
 
   //
-  // alerts
+  // alert triggers
   //
 
   const SELL_SIGNAL = asset.shares > 0
