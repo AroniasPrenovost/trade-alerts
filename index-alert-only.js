@@ -9,46 +9,46 @@ var cron = require('node-cron');
 // file management
 //
 
-const dataDirectory = path.join(__dirname, 'data');
-
-if (!fs.existsSync(dataDirectory)) { // Ensure the data directory exists
-  fs.mkdirSync(dataDirectory);
-}
-
-const appendToFile = (data) => {
-  const symbol = data.symbol;
-  const filePath = path.join(dataDirectory, `${symbol}_price_history.json`);
-  const fileData = getFileContents(symbol);
-  fileData.push(data);
-  fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
-};
-
-const getFileContents = (symbol) => {
-  const filePath = path.join(dataDirectory, `${symbol}_price_history.json`);
-  return fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : [];
-};
-
-const deleteOldEntries = () => {
-  const DAYS_TO_DELETE = 30; // Set this to '14' or '30' as needed
-  const dataDirectory = path.join(__dirname, 'data');
-  const daysAgo = Date.now() - (DAYS_TO_DELETE * 24 * 60 * 60 * 1000);
-  fs.readdir(dataDirectory, (err, files) => {
-    if (err) {
-      console.error('Error reading directory:', err);
-      return;
-    }
-    files.forEach(file => {
-      if (file.endsWith('_price_history.json')) {
-        const filePath = path.join(dataDirectory, file);
-        const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-        const filteredData = data.filter(entry => entry.date >= daysAgo);
-        fs.writeFileSync(filePath, JSON.stringify(filteredData, null, 2));
-        console.log(`Deleted old entries from ${file} (${DAYS_TO_DELETE} days)`);
-      }
-    });
-    console.log(' ');
-  });
-};
+// const dataDirectory = path.join(__dirname, 'data');
+//
+// if (!fs.existsSync(dataDirectory)) { // Ensure the data directory exists
+//   fs.mkdirSync(dataDirectory);
+// }
+//
+// const appendToFile = (data) => {
+//   const symbol = data.symbol;
+//   const filePath = path.join(dataDirectory, `${symbol}_price_history.json`);
+//   const fileData = getFileContents(symbol);
+//   fileData.push(data);
+//   fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
+// };
+//
+// const getFileContents = (symbol) => {
+//   const filePath = path.join(dataDirectory, `${symbol}_price_history.json`);
+//   return fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : [];
+// };
+//
+// const deleteOldEntries = () => {
+//   const DAYS_TO_DELETE = 30; // Set this to '14' or '30' as needed
+//   const dataDirectory = path.join(__dirname, 'data');
+//   const daysAgo = Date.now() - (DAYS_TO_DELETE * 24 * 60 * 60 * 1000);
+//   fs.readdir(dataDirectory, (err, files) => {
+//     if (err) {
+//       console.error('Error reading directory:', err);
+//       return;
+//     }
+//     files.forEach(file => {
+//       if (file.endsWith('_price_history.json')) {
+//         const filePath = path.join(dataDirectory, file);
+//         const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+//         const filteredData = data.filter(entry => entry.date >= daysAgo);
+//         fs.writeFileSync(filePath, JSON.stringify(filteredData, null, 2));
+//         console.log(`Deleted old entries from ${file} (${DAYS_TO_DELETE} days)`);
+//       }
+//     });
+//     console.log(' ');
+//   });
+// };
 
 //
 // email notifications
@@ -99,8 +99,74 @@ const SPOT_MAKER_FEE = Number(process.env.SPOT_MAKER_FEE);
 const SPOT_TAKER_FEE = Number(process.env.SPOT_TAKER_FEE);
 
 // Load asset list from config.json
-const configPath = path.join(__dirname, 'config.json');
-const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+// const configPath = path.join(__dirname, 'config.json');
+// const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+//
+//
+//
+const config = {
+  "assets": [
+    {
+      "symbol": "AVAX",
+      "support": 27,
+      "resistance": 29,
+      "entry": 0,
+      "sell_limit": 29,
+      "shares": 0,
+      "__dummy_entry": 27,
+      "__dummy_shares": 10,
+      "__dummy_sell_limit": 29
+    },
+    {
+      "symbol": "DOT",
+      "support": 4.00,
+      "resistance": 4.5,
+      "entry": 0,
+      "sell_limit": 4.35,
+      "shares": 0,
+      "__dummy_entry": 4.00,
+      "__dummy_shares": 20,
+      "__dummy_sell_limit": 4.30
+    },
+    {
+      "symbol": "UNI",
+      "support": 7.40,
+      "resistance": 9.0,
+      "entry": 0,
+      "sell_limit": 0,
+      "shares": 0,
+      "__dummy_entry": 0,
+      "__dummy_shares": 0,
+      "__dummy_sell_limit": 0
+    },
+    {
+      "symbol": "CRO",
+      "support": 0.086,
+      "resistance": 0.1,
+      "entry": 0.085,
+      "sell_limit": 0.1,
+      "shares": 0,
+      "__dummy_entry": 0,
+      "__dummy_shares": 0,
+      "__dummy_sell_limit": 0
+    },
+    {
+      "symbol": "ADA",
+      "support": 0.4,
+      "resistance": 0.45,
+      "entry": 0.4,
+      "sell_limit": 0.44,
+      "shares": 0,
+      "__dummy_entry": 0,
+      "__dummy_shares": 0,
+      "__dummy_sell_limit": 0
+    }
+  ]
+};
+
+//
+//
+//
 const ASSET_LIST = config.assets;
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
@@ -208,74 +274,6 @@ const getAndProcessAssetPriceData = async (symbol) => {
     };
   }
 };
-
-const calculateRSI = (symbol) => {
-  const data = getFileContents(symbol);
-  const fourteenDaysAgo = Date.now() - (14 * 24 * 60 * 60 * 1000);
-  const recentData = data.filter(entry => entry.date >= fourteenDaysAgo);
-
-  if (recentData.length < 2) {
-    return 'Insufficient data';
-    // console.log(`Not enough data to calculate RSI for ${symbol}`);
-    // return;
-  }
-
-  const { gains, losses } = recentData.slice(1).reduce((acc, entry, i) => {
-    const change = entry.price - recentData[i].price;
-    if (change > 0) {
-      acc.gains += change;
-    } else {
-      acc.losses -= change;
-    }
-    return acc;
-  }, { gains: 0, losses: 0 });
-
-  const averageGain = gains / recentData.length;
-  const averageLoss = losses / recentData.length;
-  const rs = averageGain / averageLoss;
-  const rsi = 100 - (100 / (1 + rs));
-
-  const overboughtOrOversold = rsi > 70 ? 'overbought' : rsi < 30 ? 'oversold' : 'neutral';
-
-  // console.log(`RSI for ${symbol}: ${rsi.toFixed(2)}, Status: ${overboughtOrOversold}`);
-  return { rsi: rsi.toFixed(2), overbought_or_oversold: overboughtOrOversold };
-};
-
-// simple moving average
-const calculateSMA = (symbol, period = 14) => {
-  const data = getFileContents(symbol);
-  if (data.length < period) {
-    return 'Insufficient data';
-    // console.log(`Not enough data to calculate SMA for ${symbol}`);
-    // return;
-  }
-
-  const recentData = data.slice(-period);
-  const sum = recentData.reduce((acc, entry) => acc + entry.price, 0);
-  const sma = sum / period;
-  // console.log(`SMA for ${symbol} over ${period} days: ${sma.toFixed(2)}`);
-  return sma.toFixed(2);
-};
-
-// exponentional moving average
-const calculateEMA = (symbol, period = 14) => {
-  const data = getFileContents(symbol);
-  if (data.length < period) {
-    return 'Insufficient data';
-    // console.log(`Not enough data to calculate EMA for ${symbol}`);
-    // return;
-  }
-
-  const k = 2 / (period + 1);
-  let ema = data.slice(0, period).reduce((acc, entry) => acc + entry.price, 0) / period;
-
-  for (let i = period; i < data.length; i++) {
-    ema = data[i].price * k + ema * (1 - k);
-  }
-  // console.log(`EMA for ${symbol} over ${period} days: ${ema.toFixed(2)}`);
-  return ema.toFixed(2);
-};
-
 
 //
 //
@@ -398,7 +396,7 @@ const processAsset = async (asset) => {
           date: Date.now(),
     } */
 
-  appendToFile(assetData);
+  // appendToFile(assetData);
 
   //
   // log the data
@@ -436,9 +434,9 @@ const processAsset = async (asset) => {
     resistance: asset.resistance,
     trade_range_percentage: calculateTradeRangePercentage(asset.support, asset.resistance),
     // custom indicators
-    rsi: calculateRSI(asset.symbol),
-    sma: calculateSMA(asset.symbol),
-    ema: calculateEMA(asset.symbol),
+    rsi: 'todo',
+    sma: 'todo',
+    ema: 'todo',
     position,
     possible_position,
   });
@@ -468,7 +466,7 @@ const processAsset = async (asset) => {
 //
 
 showAppTitle();
-deleteOldEntries();
+// deleteOldEntries();
 ASSET_LIST.forEach(processAsset);
 
 //
