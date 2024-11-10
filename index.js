@@ -3,52 +3,6 @@ const axios = require('axios');
 const Mailjet = require('node-mailjet');
 const fs = require('fs');
 const path = require('path');
-var cron = require('node-cron');
-
-//
-// file management
-//
-
-const dataDirectory = path.join(__dirname, 'data');
-
-if (!fs.existsSync(dataDirectory)) { // Ensure the data directory exists
-  fs.mkdirSync(dataDirectory);
-}
-
-const appendToFile = (data) => {
-  const symbol = data.symbol;
-  const filePath = path.join(dataDirectory, `${symbol}_price_history.json`);
-  const fileData = getFileContents(symbol);
-  fileData.push(data);
-  fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2));
-};
-
-const getFileContents = (symbol) => {
-  const filePath = path.join(dataDirectory, `${symbol}_price_history.json`);
-  return fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : [];
-};
-
-const deleteOldEntries = () => {
-  const DAYS_TO_DELETE = 30; // Set this to '14' or '30' as needed
-  const dataDirectory = path.join(__dirname, 'data');
-  const daysAgo = Date.now() - (DAYS_TO_DELETE * 24 * 60 * 60 * 1000);
-  fs.readdir(dataDirectory, (err, files) => {
-    if (err) {
-      console.error('Error reading directory:', err);
-      return;
-    }
-    files.forEach(file => {
-      if (file.endsWith('_price_history.json')) {
-        const filePath = path.join(dataDirectory, file);
-        const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-        const filteredData = data.filter(entry => entry.date >= daysAgo);
-        fs.writeFileSync(filePath, JSON.stringify(filteredData, null, 2));
-        console.log(`Deleted old entries from ${file} (${DAYS_TO_DELETE} days)`);
-      }
-    });
-    console.log(' ');
-  });
-};
 
 //
 // email notifications
@@ -209,74 +163,6 @@ const getAndProcessAssetPriceData = async (symbol) => {
   }
 };
 
-const calculateRSI = (symbol) => {
-  const data = getFileContents(symbol);
-  const fourteenDaysAgo = Date.now() - (14 * 24 * 60 * 60 * 1000);
-  const recentData = data.filter(entry => entry.date >= fourteenDaysAgo);
-
-  if (recentData.length < 2) {
-    return 'Insufficient data';
-    // console.log(`Not enough data to calculate RSI for ${symbol}`);
-    // return;
-  }
-
-  const { gains, losses } = recentData.slice(1).reduce((acc, entry, i) => {
-    const change = entry.price - recentData[i].price;
-    if (change > 0) {
-      acc.gains += change;
-    } else {
-      acc.losses -= change;
-    }
-    return acc;
-  }, { gains: 0, losses: 0 });
-
-  const averageGain = gains / recentData.length;
-  const averageLoss = losses / recentData.length;
-  const rs = averageGain / averageLoss;
-  const rsi = 100 - (100 / (1 + rs));
-
-  const overboughtOrOversold = rsi > 70 ? 'overbought' : rsi < 30 ? 'oversold' : 'neutral';
-
-  // console.log(`RSI for ${symbol}: ${rsi.toFixed(2)}, Status: ${overboughtOrOversold}`);
-  return { rsi: rsi.toFixed(2), overbought_or_oversold: overboughtOrOversold };
-};
-
-// simple moving average
-const calculateSMA = (symbol, period = 14) => {
-  const data = getFileContents(symbol);
-  if (data.length < period) {
-    return 'Insufficient data';
-    // console.log(`Not enough data to calculate SMA for ${symbol}`);
-    // return;
-  }
-
-  const recentData = data.slice(-period);
-  const sum = recentData.reduce((acc, entry) => acc + entry.price, 0);
-  const sma = sum / period;
-  // console.log(`SMA for ${symbol} over ${period} days: ${sma.toFixed(2)}`);
-  return sma.toFixed(2);
-};
-
-// exponentional moving average
-const calculateEMA = (symbol, period = 14) => {
-  const data = getFileContents(symbol);
-  if (data.length < period) {
-    return 'Insufficient data';
-    // console.log(`Not enough data to calculate EMA for ${symbol}`);
-    // return;
-  }
-
-  const k = 2 / (period + 1);
-  let ema = data.slice(0, period).reduce((acc, entry) => acc + entry.price, 0) / period;
-
-  for (let i = period; i < data.length; i++) {
-    ema = data[i].price * k + ema * (1 - k);
-  }
-  // console.log(`EMA for ${symbol} over ${period} days: ${ema.toFixed(2)}`);
-  return ema.toFixed(2);
-};
-
-
 //
 //
 //
@@ -381,7 +267,7 @@ function showAppTitle() {
 const processAsset = async (asset) => {
 
   //
-  // get and save the data
+  // get data
   //
 
   const assetData = await getAndProcessAssetPriceData(asset.symbol);
@@ -400,8 +286,6 @@ const processAsset = async (asset) => {
           date: Date.now(),
     } */
 
-  appendToFile(assetData);
-
   //
   // log the data
   //
@@ -414,7 +298,6 @@ const processAsset = async (asset) => {
     federal_tax_rate: FEDERAL_TAX_RATE,
     total_transaction_cost: calculateTransactionCost(asset.entry, asset.shares, 'taker'),
     sell_now: calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker'),
-    sell_limit: asset.sell_limit,
     sell_at_limit: calculateTradeProfit(asset.entry, asset.sell_limit, asset.shares, 'taker'),
   } : null;
 
@@ -428,7 +311,6 @@ const processAsset = async (asset) => {
       federal_tax_rate: FEDERAL_TAX_RATE,
       total_transaction_cost: calculateTransactionCost(asset.__dummy_entry, asset.__dummy_shares, 'taker'),
       sell_now: calculateTradeProfit(asset.__dummy_entry, currentPrice, asset.__dummy_shares, 'taker'),
-      sell_limit: asset.__dummy_sell_limit,
       sell_at_limit: calculateTradeProfit(asset.__dummy_entry, asset.__dummy_sell_limit, asset.__dummy_shares, 'taker'),
   } : null;
 
@@ -439,10 +321,6 @@ const processAsset = async (asset) => {
     support: asset.support,
     resistance: asset.resistance,
     trade_range_percentage: calculateTradeRangePercentage(asset.support, asset.resistance),
-    // custom indicators
-    rsi: calculateRSI(asset.symbol),
-    sma: calculateSMA(asset.symbol),
-    ema: calculateEMA(asset.symbol),
     position,
     possible_position,
   });
@@ -472,12 +350,7 @@ const processAsset = async (asset) => {
 //
 
 showAppTitle();
-deleteOldEntries();
 ASSET_LIST.forEach(processAsset);
-
-//
-// repeat every X interval
-//
 
 /*
 
@@ -504,10 +377,3 @@ ASSET_LIST.forEach(processAsset);
 
 
 */
-
-// cron.schedule('0 * * * *', () => { // every 1 hour
-cron.schedule('0 */3 * * *', () => { // every 3 hours
-  showAppTitle();
-  deleteOldEntries();
-  ASSET_LIST.forEach(processAsset);
-});
