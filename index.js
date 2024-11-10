@@ -221,31 +221,6 @@ function calculateTradeRangePercentage(num1, num2) {
 }
 
 //
-// random utils
-//
-
-function createHumanReadableDateNow() {
-  const date = new Date();
-  const timeOptions = {
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true,
-    timeZone: 'America/Los_Angeles' // PST timezone
-  };
-
-  const dateOptions = {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    timeZone: 'America/Los_Angeles' // PST timezone
-  };
-
-  const formattedTime = new Intl.DateTimeFormat('en-US', timeOptions).format(date);
-  const formattedDate = new Intl.DateTimeFormat('en-US', dateOptions).format(date);
-  return `${formattedDate} ${formattedTime}`;
-}
-
-//
 // main loop
 //
 
