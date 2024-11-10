@@ -56,19 +56,7 @@ You can run the application in two different ways:
 
 ## Running as a Cron Job on Google Cloud Functions
 
-To run this application as a scheduled task using Google Cloud Functions, you can set up a Cloud Scheduler job that triggers a Cloud Function. Here's a brief overview of the steps:
-
-1. **Deploy the function:**
-
-   Create a new Google Cloud Function that runs the `main` function from `index.js`. Ensure all necessary environment variables are set in the function's configuration.
-
-2. **Set up Cloud Scheduler:**
-
-   Use Google Cloud Scheduler to create a cron job that triggers your Cloud Function at desired intervals (e.g., every hour).
-
-3. **Configure permissions:**
-
-   Ensure that the Cloud Scheduler has the necessary permissions to invoke the Cloud Function.
+To run this application as a scheduled task using Google Cloud Functions, you can set up a Cloud Scheduler job that triggers a Cloud Function.
 
 ## License
 
