@@ -1,8 +1,8 @@
 require('dotenv').config();
-const axios = require('axios');
-const Mailjet = require('node-mailjet');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
+const Mailjet = require('node-mailjet');
 
 //
 // email notifications
@@ -301,29 +301,3 @@ const processAsset = async (asset) => {
 };
 
 ASSET_LIST.forEach(processAsset);
-
-/*
-
-  To determine if you'll hit the 10,000 API calls limit in a month, let's break down the scenario:
-
-  1. **Number of assets**: 5
-  2. **Frequency of Checks**: Every 3 hours
-  3. **Number of Days in a Month**: Approximately 30 (for calculation purposes)
-
-  First, calculate the number of checks per day:
-
-  - There are 24 hours in a day.
-  - If you run a check every 3 hours, you'll have \( \frac{24}{3} = 8 \) checks per day.
-
-  Next, calculate the total number of checks for all cryptos per day:
-
-  - 5 cryptos * 8 checks per day = 40 checks per day
-
-  Now, calculate the total number of API calls in a month:
-
-  - 40 checks per day * 30 days = 1,200 API calls per month
-
-  Since 1,200 API calls per month is well below the 10,000 API calls limit, you will not hit the maximum limit with the current setup.
-
-
-*/
