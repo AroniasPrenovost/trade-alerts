@@ -4,10 +4,6 @@ const path = require('path');
 const axios = require('axios');
 const Mailjet = require('node-mailjet');
 
-//
-// email notifications
-//
-
 const mailjet = Mailjet.apiConnect(
   process.env.MAILJET_API_KEY,
   process.env.MAILJET_SECRET_KEY,
@@ -24,8 +20,7 @@ const sendTradeNotification = (asset, price, action) => {
   const htmlPart = `<h3>${asset.symbol} - ${action.toUpperCase()}</h3>
     <h4>current price: ${price}</h4>
     <p>High Resistance: ${asset.resistance}.</p>
-    <p>LOW: ${asset.support}</p>`
-    ;
+    <p>LOW: ${asset.support}</p>`;
 
   mailjet
     .post('send', { version: 'v3.1' })
@@ -44,15 +39,10 @@ const sendTradeNotification = (asset, price, action) => {
     .catch((err) => console.log(err.statusCode));
 };
 
-//
-// stock/crypto data
-//
-
 const FEDERAL_TAX_RATE = Number(process.env.FEDERAL_TAX_RATE);
 const SPOT_MAKER_FEE = Number(process.env.SPOT_MAKER_FEE);
 const SPOT_TAKER_FEE = Number(process.env.SPOT_TAKER_FEE);
 
-// Load asset list from config.json
 const configPath = path.join(__dirname, 'config.json');
 const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 const ASSET_LIST = config.assets;
@@ -69,60 +59,7 @@ const fetchCurrentAssetData = async (symbol) => {
       },
       params: { symbol },
     });
-    // return Number(response.data.data[symbol].quote.USD.price ?? 0);
-    return response.data.data[symbol]; // Return the entire data object for the symbol
-    /*
-
-    {
-     id: 5805,
-     name: 'Avalanche',
-     symbol: 'AVAX',
-     slug: 'avalanche',
-     num_market_pairs: 796,
-     date_added: '2020-07-13T00:00:00.000Z',
-     tags: [
-       'defi',
-       'smart-contracts',
-       'three-arrows-capital-portfolio',
-       'polychain-capital-portfolio',
-       'avalanche-ecosystem',
-       'cms-holdings-portfolio',
-       'dragonfly-capital-portfolio',
-       'real-world-assets',
-       'layer-1'
-     ],
-     max_supply: 715748719,
-     circulating_supply: 407095358.7405858,
-     total_supply: 447098458.7405858,
-     is_active: 1,
-     infinite_supply: false,
-     platform: null,
-     cmc_rank: 13,
-     is_fiat: 0,
-     self_reported_circulating_supply: null,
-     self_reported_market_cap: null,
-     tvl_ratio: null,
-     last_updated: '2024-10-30T21:37:00.000Z',
-     quote: {
-       USD: {
-         price: 26.261409930816203,
-         volume_24h: 245819804.54966748,
-         volume_change_24h: -15.8572,
-         percent_change_1h: -0.00456268,
-         percent_change_24h: -1.38814989,
-         percent_change_7d: -1.34416107,
-         percent_change_30d: -6.86169753,
-         percent_change_60d: 15.41194715,
-         percent_change_90d: 3.12103704,
-         market_cap: 10690898096.819204,
-         market_cap_dominance: 0.4399,
-         fully_diluted_market_cap: 18796570517.12,
-         tvl: null,
-         last_updated: '2024-10-30T21:37:00.000Z'
-       }
-     }
-
-    */
+    return response.data.data[symbol];
   } catch (error) {
     console.error('Error fetching latest data:', error);
     console.log('symbol: ', symbol);
@@ -133,7 +70,6 @@ const fetchCurrentAssetData = async (symbol) => {
 const getAndProcessAssetPriceData = async (symbol) => {
   const currentData = await fetchCurrentAssetData(symbol);
   if (currentData !== null) {
-
     const price = Number(currentData.quote.USD.price ?? 0);
     const volume_24h = Number(currentData.quote.USD.volume_24h ?? 0);
     const volume_change_24h = Number(currentData.quote.USD.volume_change_24h ?? 0);
@@ -144,7 +80,6 @@ const getAndProcessAssetPriceData = async (symbol) => {
     const percent_change_60d = Number(currentData.quote.USD.percent_change_60d ?? 0);
     const percent_change_90d = Number(currentData.quote.USD.percent_change_90d ?? 0);
     const market_cap = Number(currentData.quote.USD.market_cap ?? 0);
-    // console.log({currentData, price})
 
     return {
       symbol,
@@ -163,52 +98,34 @@ const getAndProcessAssetPriceData = async (symbol) => {
   }
 };
 
-//
-//
-//
-
 function calculateExchangeFee(price, numberOfShares, feeType) {
-    // Determine the exchange fee rate based on the fee type
-    const feeRate = (feeType.toLowerCase() === 'maker') ? SPOT_MAKER_FEE : SPOT_TAKER_FEE;
-    const fee = (feeRate / 100) * price * numberOfShares;
-    return fee;
+  const feeRate = (feeType.toLowerCase() === 'maker') ? SPOT_MAKER_FEE : SPOT_TAKER_FEE;
+  const fee = (feeRate / 100) * price * numberOfShares;
+  return fee;
 }
 
 function calculateTradeProfit(entryPrice, sellPrice, numberOfShares, feeType) {
-    // Calculate the gross profit
-    const profit = (sellPrice - entryPrice) * numberOfShares;
+  const profit = (sellPrice - entryPrice) * numberOfShares;
+  const exchange_fee = calculateExchangeFee(sellPrice, numberOfShares, feeType);
+  const tax_owed = (FEDERAL_TAX_RATE / 100) * profit;
+  const gross_profit = profit - exchange_fee - tax_owed;
+  const investment = entryPrice * numberOfShares;
+  const gross_profit_percentage = (gross_profit / investment) * 100;
 
-    // Determine the exchange fee based on the fee type
-    const exchange_fee = calculateExchangeFee(sellPrice, numberOfShares, feeType);
-
-    // Calculate the tax owed
-    const tax_owed = (FEDERAL_TAX_RATE / 100) * profit;
-
-    // Calculate profit after tax and fees
-    const gross_profit = profit - exchange_fee - tax_owed;
-
-    // Calculate the net profit percentage after tax and fees
-    const investment = entryPrice * numberOfShares;
-    const gross_profit_percentage = (gross_profit / investment) * 100;
-
-    // Return the calculated values in an object
-    return {
-        sellPrice,
-        profit,
-        exchange_fee,
-        tax_owed,
-        gross_profit,
-        gross_profit_percentage
-    };
+  return {
+    sellPrice,
+    profit,
+    exchange_fee,
+    tax_owed,
+    gross_profit,
+    gross_profit_percentage
+  };
 }
 
 function calculateTransactionCost(entryPrice, numberOfShares, feeType) {
   if (numberOfShares === 0) return 0;
-  // Calculate the total cost without fees
   const base_cost = entryPrice * numberOfShares;
-  // Calculate the exchange fee
   const exchange_fee = calculateExchangeFee(entryPrice, numberOfShares, feeType);
-  // Calculate the final purchase price including fee
   const cost = base_cost + exchange_fee;
   return cost;
 }
@@ -222,30 +139,11 @@ function calculateTradeRangePercentage(num1, num2) {
 }
 
 //
-// main loop
+//
 //
 
 const processAsset = async (asset) => {
-
   const assetData = await getAndProcessAssetPriceData(asset.symbol);
-    /* {
-          symbol: asset.symbol,
-          price,
-          volume_24h,
-          volume_change_24h,
-          percent_change_1h,
-          percent_change_24h,
-          percent_change_7d,
-          percent_change_30d,
-          percent_change_60d,
-          percent_change_90d,
-          market_cap,
-          date: Date.now(),
-    } */
-
-  //
-  // log the data
-  //
 
   const currentPrice = assetData.price;
 
@@ -257,7 +155,6 @@ const processAsset = async (asset) => {
     sell_now: calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker'),
     sell_at_limit: calculateTradeProfit(asset.entry, asset.sell_limit, asset.shares, 'taker'),
   } : null;
-
 
   const dummy_position =
     asset.__dummy_shares !== 0 && asset.__dummy_entry !== 0
@@ -271,7 +168,6 @@ const processAsset = async (asset) => {
       sell_at_limit: calculateTradeProfit(asset.__dummy_entry, asset.__dummy_sell_limit, asset.__dummy_shares, 'taker'),
   } : null;
 
-
   console.log({
     symbol: asset.symbol,
     price: currentPrice,
@@ -282,22 +178,33 @@ const processAsset = async (asset) => {
     dummy_position,
   });
 
-  //
-  // alert triggers
-  //
-
-  const SELL_SIGNAL = asset.shares > 0
-    && currentPrice >= asset.resistance;
-
-  const BUY_SIGNAL = asset.shares === 0
-    && currentPrice <= asset.support;
+  const SELL_SIGNAL = asset.shares > 0 && currentPrice >= asset.resistance;
+  const BUY_SIGNAL = asset.shares === 0 && currentPrice <= asset.support;
 
   if (SELL_SIGNAL) sendTradeNotification(asset, currentPrice, 'sell');
   if (BUY_SIGNAL) sendTradeNotification(asset, currentPrice, 'buy');
-
-  // if (!SELL_SIGNAL && !BUY_SIGNAL) {
-    // console.log('price is between high and low', currentPrice);
-  // }
 };
 
-ASSET_LIST.forEach(processAsset);
+//
+//
+//
+
+const main = async () => {
+  const args = process.argv.slice(2);
+  const symbol = args[0] ? args[0].toUpperCase() : args[0];
+
+  if (symbol) {
+    const asset = ASSET_LIST.find(asset => asset.symbol === symbol);
+    if (asset) {
+      await processAsset(asset);
+    } else {
+      console.log(`Asset with symbol ${symbol} not found.`);
+    }
+  } else {
+    for (const asset of ASSET_LIST) {
+      await processAsset(asset);
+    }
+  }
+};
+
+main();
