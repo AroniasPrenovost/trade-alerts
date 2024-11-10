@@ -208,8 +208,6 @@ function calculateTransactionCost(entryPrice, numberOfShares, feeType) {
   // Calculate the exchange fee
   const exchange_fee = calculateExchangeFee(entryPrice, numberOfShares, feeType);
   // Calculate the final purchase price including fee
-  console.log('___')
-  console.log({entryPrice, numberOfShares, feeType})
   const cost = base_cost + exchange_fee;
   return cost;
 }
