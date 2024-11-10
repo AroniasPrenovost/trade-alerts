@@ -2,6 +2,11 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const Mailjet = require('node-mailjet');
+
+//
+// copy + paste below
+//
 
 //
 // config override
@@ -79,7 +84,7 @@ const assets = null;
 // email
 //
 
-const Mailjet = require('node-mailjet');
+
 
 const mailjet = Mailjet.apiConnect(
   process.env.MAILJET_API_KEY,
