@@ -193,6 +193,7 @@ function calculateTradeProfit(entryPrice, sellPrice, numberOfShares, feeType) {
 
     // Return the calculated values in an object
     return {
+        sellPrice,
         profit,
         exchange_fee,
         tax_owed,
@@ -258,7 +259,7 @@ const processAsset = async (asset) => {
   } : null;
 
 
-  const possible_position =
+  const dummy_position =
     asset.__dummy_shares !== 0 && asset.__dummy_entry !== 0
     ?
     {
@@ -278,7 +279,7 @@ const processAsset = async (asset) => {
     resistance: asset.resistance,
     trade_range_percentage: calculateTradeRangePercentage(asset.support, asset.resistance),
     position,
-    possible_position,
+    dummy_position,
   });
 
   //
