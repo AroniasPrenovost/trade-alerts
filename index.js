@@ -4,6 +4,12 @@ const path = require('path');
 const axios = require('axios');
 
 //
+// config override
+//
+
+const assets = null;
+
+//
 // email
 //
 
@@ -52,9 +58,14 @@ const FEDERAL_TAX_RATE = Number(process.env.FEDERAL_TAX_RATE);
 const SPOT_MAKER_FEE = Number(process.env.SPOT_MAKER_FEE);
 const SPOT_TAKER_FEE = Number(process.env.SPOT_TAKER_FEE);
 
-const configPath = path.join(__dirname, 'config.json');
-const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-const ASSET_LIST = config.assets;
+let ASSET_LIST = null;
+if (assets) {
+  ASSET_LIST = assets;
+} else {
+  const configPath = path.join(__dirname, 'config.json');
+  const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  ASSET_LIST = config.assets;
+}
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
 
