@@ -66,7 +66,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue.
 
-## Acknowledgments
+## 3rd Party APIs
 
 - [CoinMarketCap API](https://coinmarketcap.com/api/)
 - [Mailjet](https://www.mailjet.com/)
