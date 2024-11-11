@@ -96,29 +96,35 @@ const MAILJET_FROM_NAME = process.env.MAILJET_FROM_NAME;
 const MAILJET_TO_EMAIL = process.env.MAILJET_TO_EMAIL;
 const MAILJET_TO_NAME = process.env.MAILJET_TO_NAME;
 
-const sendTradeNotification = (asset, price, action) => {
-  const subject = `~~ ${action.toUpperCase()} - ${asset.symbol}`;
-  const textPart = `Trade Recommendation: ${action.toUpperCase()} ${asset.symbol} at ${price}.`;
-  const htmlPart = `<h3>${asset.symbol} - ${action.toUpperCase()}</h3>
-    <h4>current price: ${price}</h4>
-    <p>High Resistance: ${asset.resistance}.</p>
-    <p>LOW: ${asset.support}</p>`;
+const sendTradeNotification = (action, dataOutputObj) => {
+  const actionToTake = action.toUpperCase();
+  const symbol = dataOutputObj.symbol;
+  const price = dataOutputObj.price;
 
-  mailjet
-    .post('send', { version: 'v3.1' })
-    .request({
-      Messages: [
-        {
-          From: { Email: MAILJET_FROM_EMAIL, Name: MAILJET_FROM_NAME },
-          To: [{ Email: MAILJET_TO_EMAIL, Name: MAILJET_TO_NAME }],
-          Subject: subject,
-          TextPart: textPart,
-          HTMLPart: htmlPart,
-        },
-      ],
-    })
-    .then((result) => console.log(`ALERT: ${result.body.Messages[0].To[0].Email} - ${new Date()}`))
-    .catch((err) => console.log(err.statusCode));
+  const subject = `~~ ${symbol} - ${actionToTake} - $${price}`;
+  const textPart = `Trade Recommendation: ${actionToTake} ${symbol} at ${price}.`;
+  const htmlPart = `<h3>${symbol} - Price Report</h3>
+    <p><strong>suggestion<strong>: ${actionToTake}</p>
+    <pre>
+      ${JSON.stringify(dataOutputObj, undefined, 2)}
+    </pre>
+  `;
+
+    mailjet
+      .post('send', { version: 'v3.1' })
+      .request({
+        Messages: [
+          {
+            From: { Email: MAILJET_FROM_EMAIL, Name: MAILJET_FROM_NAME },
+            To: [{ Email: MAILJET_TO_EMAIL, Name: MAILJET_TO_NAME }],
+            Subject: subject,
+            TextPart: textPart,
+            HTMLPart: htmlPart,
+          },
+        ],
+      })
+      .then((result) => console.log(`ALERT: ${result.body.Messages[0].To[0].Email} - ${new Date()}`))
+      .catch((err) => console.log(err.statusCode));
 };
 
 //
@@ -238,6 +244,10 @@ const processAsset = async (asset) => {
 
   const currentPrice = assetData.price;
 
+  //
+  // put together data output
+  //
+
   const position = asset.shares > 0 ? {
     entry_price: asset.entry,
     shares: asset.shares,
@@ -259,7 +269,7 @@ const processAsset = async (asset) => {
       sell_at_limit: calculateTradeProfit(asset.__dummy_entry, asset.__dummy_sell_limit, asset.__dummy_shares, 'taker'),
   } : null;
 
-  console.log({
+  const LOGGED_DATA_OBJ = {
     symbol: asset.symbol,
     price: currentPrice,
     support: asset.support,
@@ -267,17 +277,22 @@ const processAsset = async (asset) => {
     trade_range_percentage: calculateTradeRangePercentage(asset.support, asset.resistance),
     position,
     dummy_position,
-  });
+  };
+
+  console.log(LOGGED_DATA_OBJ);
+  // sendTradeNotification('buy', LOGGED_DATA_OBJ);
+  // return;
 
   const SELL_SIGNAL = asset.shares > 0 && currentPrice >= asset.resistance;
+
   const BUY_SIGNAL = asset.shares === 0 && currentPrice <= asset.support;
 
-  if (SELL_SIGNAL) sendTradeNotification(asset, currentPrice, 'sell');
-  if (BUY_SIGNAL) sendTradeNotification(asset, currentPrice, 'buy');
+  if (SELL_SIGNAL) sendTradeNotification('sell', LOGGED_DATA_OBJ);
+  if (BUY_SIGNAL) sendTradeNotification('buy', LOGGED_DATA_OBJ);
 
   if (asset.alert_level > 0) {
     if (currentPrice >= asset.alert_level) {
-      sendTradeNotification(asset, currentPrice, 'alert');
+      sendTradeNotification('alert', LOGGED_DATA_OBJ);
     }
   }
 };
