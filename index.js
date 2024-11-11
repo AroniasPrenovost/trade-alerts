@@ -297,7 +297,7 @@ const processAsset = async (asset) => {
 };
 
 //
-// mail loop
+// main loop
 //
 
 const main = async () => {
