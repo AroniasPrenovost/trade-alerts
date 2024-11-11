@@ -43,13 +43,13 @@ You can run the application in two different ways:
 1. **Run for all assets:**
 
    ```bash
-   node index.js
+   node index
    ```
 
 2. **Run for a specific asset by symbol:**
 
    ```bash
-   node index.js SYMBOL
+   node index SYMBOL
    ```
 
    Replace `SYMBOL` with the cryptocurrency symbol you want to monitor.
@@ -57,6 +57,12 @@ You can run the application in two different ways:
 ## Running as a Cron Job on Google Cloud Functions
 
 To run this application as a scheduled task using Google Cloud Functions, you can set up a Cloud Scheduler job that triggers a Cloud Function.
+
+**Build for Google Cloud Function:**
+
+   ```bash
+   node index build
+   ```
 
 ## License
 
