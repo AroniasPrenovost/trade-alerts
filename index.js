@@ -306,7 +306,7 @@ const main = async () => {
 
   if (symbolArg) {
     const asset = ASSET_LIST.find(asset => asset.symbol === symbolArg);
-    if (asset && asset.enabled) {
+    if (asset) {
       await processAsset(asset);
     } else {
       console.log(`Asset with symbol ${symbolArg} not found or disabled.`);
