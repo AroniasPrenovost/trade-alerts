@@ -9,78 +9,6 @@ const Mailjet = require('node-mailjet');
 //
 
 //
-// config override
-//
-
-const assets = null;
-
-//
-// const assets = [
-//     {
-//         "symbol": "AVAX",
-//         "support": 26,
-//         "resistance": 29.8,
-//         "entry": 0,
-//         "sell_limit": 29,
-//         "shares": 0,
-//         "alert_level": 0,
-//         "__dummy_entry": 26,
-//         "__dummy_shares": 10,
-//         "__dummy_sell_limit": 29
-//     },
-//     {
-//         "symbol": "DOT",
-//         "support": 4.20,
-//         "resistance": 4.6,
-//         "entry": 0,
-//         "sell_limit": 4.6,
-//         "shares": 0,
-//         "alert_level": 0,
-//         "__dummy_entry": 4.1,
-//         "__dummy_shares": 100,
-//         "__dummy_sell_limit": 4.50
-//     },
-//     {
-//         "symbol": "UNI",
-//         "support": 7.40,
-//         "resistance": 9.0,
-//         "entry": 0,
-//         "sell_limit": 0,
-//         "shares": 0,
-//         "alert_level": 0,
-//         "__dummy_entry": 7.45,
-//         "__dummy_shares": 20,
-//         "__dummy_sell_limit": 9.10
-//     },
-//     {
-//         "symbol": "CRO",
-//         "support": 0.1,
-//         "resistance": 0.2,
-//         "entry": 0.1221,
-//         "sell_limit": 0.15,
-//         "shares": 800,
-//         "alert_level": 0.14,
-//         "__dummy_entry": 0.1221,
-//         "__dummy_shares": 800,
-//         "__dummy_sell_limit": 0.17
-//     },
-//     {
-//         "symbol": "ADA",
-//         "support": 0.55,
-//         "resistance": 0.75,
-//         "entry": 0.59,
-//         "sell_limit": 0.7,
-//         "shares": 100.16807396,
-//         "alert_level": 0.67,
-//         "__dummy_entry": 0.59,
-//         "__dummy_shares": 100.16807396,
-//         "__dummy_sell_limit": 0.67
-//     }
-// ];
-
-
-
-//
 // email
 //
 
@@ -133,15 +61,6 @@ const sendTradeNotification = (action, dataOutputObj) => {
 const FEDERAL_TAX_RATE = Number(process.env.FEDERAL_TAX_RATE);
 const SPOT_MAKER_FEE = Number(process.env.SPOT_MAKER_FEE);
 const SPOT_TAKER_FEE = Number(process.env.SPOT_TAKER_FEE);
-
-let ASSET_LIST = null;
-if (assets) {
-  ASSET_LIST = assets;
-} else {
-  const configPath = path.join(__dirname, 'config.json');
-  const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-  ASSET_LIST = config.assets;
-}
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
 
@@ -301,6 +220,10 @@ const processAsset = async (asset) => {
 //
 
 const main = async () => {
+  const configPath = path.join(__dirname, 'config.json');
+  const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  const ASSET_LIST = config.assets;
+  
   const args = process.argv.slice(2);
   const symbolArg = args[0] ? args[0].toUpperCase() : args[0];
 
