@@ -306,14 +306,16 @@ const main = async () => {
 
   if (symbolArg) {
     const asset = ASSET_LIST.find(asset => asset.symbol === symbolArg);
-    if (asset) {
+    if (asset && asset.enabled) {
       await processAsset(asset);
     } else {
-      console.log(`Asset with symbol ${symbol} not found.`);
+      console.log(`Asset with symbol ${symbolArg} not found or disabled.`);
     }
   } else {
     for (const asset of ASSET_LIST) {
-      await processAsset(asset);
+      if (asset.enabled) {
+        await processAsset(asset);
+      }
     }
   }
 };
