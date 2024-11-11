@@ -85,7 +85,6 @@ const assets = null;
 //
 
 
-
 const mailjet = Mailjet.apiConnect(
   process.env.MAILJET_API_KEY,
   process.env.MAILJET_SECRET_KEY,
@@ -303,10 +302,10 @@ const processAsset = async (asset) => {
 
 const main = async () => {
   const args = process.argv.slice(2);
-  const symbol = args[0] ? args[0].toUpperCase() : args[0];
+  const symbolArg = args[0] ? args[0].toUpperCase() : args[0];
 
-  if (symbol) {
-    const asset = ASSET_LIST.find(asset => asset.symbol === symbol);
+  if (symbolArg) {
+    const asset = ASSET_LIST.find(asset => asset.symbol === symbolArg);
     if (asset) {
       await processAsset(asset);
     } else {
