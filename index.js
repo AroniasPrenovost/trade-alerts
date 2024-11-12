@@ -83,33 +83,20 @@ const fetchCurrentAssetData = async (symbol) => {
 };
 
 const getAndProcessAssetPriceData = async (symbol) => {
-  const currentData = await fetchCurrentAssetData(symbol);
-  if (currentData !== null) {
-    const price = Number(currentData.quote.USD.price ?? 0);
-    const volume_24h = Number(currentData.quote.USD.volume_24h ?? 0);
-    const volume_change_24h = Number(currentData.quote.USD.volume_change_24h ?? 0);
-    const percent_change_1h = Number(currentData.quote.USD.percent_change_1h ?? 0);
-    const percent_change_24h = Number(currentData.quote.USD.percent_change_24h ?? 0);
-    const percent_change_7d = Number(currentData.quote.USD.percent_change_7d ?? 0);
-    const percent_change_30d = Number(currentData.quote.USD.percent_change_30d ?? 0);
-    const percent_change_60d = Number(currentData.quote.USD.percent_change_60d ?? 0);
-    const percent_change_90d = Number(currentData.quote.USD.percent_change_90d ?? 0);
-    const market_cap = Number(currentData.quote.USD.market_cap ?? 0);
-
-    return {
-      symbol,
-      price,
-      volume_24h,
-      volume_change_24h,
-      percent_change_1h,
-      percent_change_24h,
-      percent_change_7d,
-      percent_change_30d,
-      percent_change_60d,
-      percent_change_90d,
-      market_cap,
-      date: Date.now(),
-    };
+  const data = await fetchCurrentAssetData(symbol);
+  if (data !== null) {
+    delete data.id;
+    delete data.name;
+    delete data.slug;
+    delete data.tags;
+    delete data.isActive;
+    delete data.platform;
+    delete data.date_added;
+    delete data.is_fiat;
+    delete data.infinite_supply;
+    // add unix timestamp
+    data.date = Date.now();
+    return data;
   }
 };
 
@@ -159,8 +146,9 @@ function calculateTradeRangePercentage(num1, num2) {
 
 const processAsset = async (asset) => {
   const assetData = await getAndProcessAssetPriceData(asset.symbol);
+  // console.log({assetData})
 
-  const currentPrice = assetData.price;
+  const currentPrice = assetData.quote.USD.price;
 
   //
   // put together data output
@@ -197,10 +185,10 @@ const processAsset = async (asset) => {
     dummy_position,
   };
 
+  // log findings
   console.log(LOGGED_DATA_OBJ);
-  // sendTradeNotification('buy', LOGGED_DATA_OBJ);
-  // return;
 
+  // trigger alerts
   const SELL_SIGNAL = asset.shares > 0 && currentPrice >= asset.resistance;
 
   const BUY_SIGNAL = asset.shares === 0 && currentPrice <= asset.support;
@@ -250,7 +238,7 @@ const main = async () => {
 };
 
 main();
-// SPLIT_HERE
+
 
 function copyAndModifyFileForGoogleCloud() {
   const sourceFilePath = __filename;
@@ -270,9 +258,9 @@ function copyAndModifyFileForGoogleCloud() {
   modifiedContent = modifiedContent.replace("const path = require('path');", "");
   modifiedContent = modifiedContent.replace("const axios = require('axios');", "");
   modifiedContent = modifiedContent.replace("const Mailjet = require('node-mailjet');", "");
-  modifiedContent = modifiedContent.split("// SPLIT_HERE")[0];
+  // modifiedContent = modifiedContent.split("// SPLIT_HERE")[0];
 
   fs.writeFileSync(destinationFilePath, modifiedContent, 'utf8');
 }
 
-// copyAndModifyFileForGoogleCloud();
+// SPLIT_HERE
