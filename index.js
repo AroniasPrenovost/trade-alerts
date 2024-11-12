@@ -94,6 +94,20 @@ const getAndProcessAssetPriceData = async (symbol) => {
     delete data.date_added;
     delete data.is_fiat;
     delete data.infinite_supply;
+    delete data.self_reported_circulating_supply;
+    delete data.self_reported_market_cap;
+    delete data.tvl_ratio;
+    delete data.is_active;
+    delete data.max_supply;
+    delete data.circulating_supply;
+    delete data.total_supply;
+    delete data.last_updated;
+    delete data.quote.USD.last_updated;
+    delete data.quote.USD.tvl;
+    delete data.quote.USD.fully_diluted_market_cap;
+    delete data.num_market_pairs;
+
+    data.quote = {...data.quote.USD};
     // add unix timestamp
     data.date = Date.now();
     return data;
@@ -146,9 +160,9 @@ function calculateTradeRangePercentage(num1, num2) {
 
 const processAsset = async (asset) => {
   const assetData = await getAndProcessAssetPriceData(asset.symbol);
-  // console.log({assetData})
+  console.log(JSON.stringify(assetData, null, 2));
 
-  const currentPrice = assetData.quote.USD.price;
+  const currentPrice = assetData.quote.price;
 
   //
   // put together data output
@@ -157,8 +171,8 @@ const processAsset = async (asset) => {
   const position = asset.shares > 0 ? {
     entry_price: asset.entry,
     shares: asset.shares,
-    federal_tax_rate: FEDERAL_TAX_RATE,
-    total_transaction_cost: calculateTransactionCost(asset.entry, asset.shares, 'taker'),
+    // federal_tax_rate: FEDERAL_TAX_RATE,
+    entry_transaction_cost: calculateTransactionCost(asset.entry, asset.shares, 'taker'),
     sell_now: calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker'),
     sell_at_limit: calculateTradeProfit(asset.entry, asset.sell_limit, asset.shares, 'taker'),
   } : null;
@@ -170,14 +184,15 @@ const processAsset = async (asset) => {
       entry_price: asset.__dummy_entry,
       shares: asset.__dummy_shares,
       federal_tax_rate: FEDERAL_TAX_RATE,
-      total_transaction_cost: calculateTransactionCost(asset.__dummy_entry, asset.__dummy_shares, 'taker'),
+      entry_transaction_cost: calculateTransactionCost(asset.__dummy_entry, asset.__dummy_shares, 'taker'),
       sell_now: calculateTradeProfit(asset.__dummy_entry, currentPrice, asset.__dummy_shares, 'taker'),
       sell_at_limit: calculateTradeProfit(asset.__dummy_entry, asset.__dummy_sell_limit, asset.__dummy_shares, 'taker'),
   } : null;
 
   const LOGGED_DATA_OBJ = {
-    symbol: asset.symbol,
-    price: currentPrice,
+    // symbol: asset.symbol,
+    // price: currentPrice,
+    ...assetData,
     support: asset.support,
     resistance: asset.resistance,
     trade_range_percentage: calculateTradeRangePercentage(asset.support, asset.resistance),
