@@ -23,10 +23,10 @@ const MAILJET_FROM_NAME = process.env.MAILJET_FROM_NAME;
 const MAILJET_TO_EMAIL = process.env.MAILJET_TO_EMAIL;
 const MAILJET_TO_NAME = process.env.MAILJET_TO_NAME;
 
-const sendTradeNotification = (action, dataOutputObj) => {
+const sendEmailNotification = (action, dataOutputObj) => {
   const actionToTake = action.toUpperCase();
   const symbol = dataOutputObj.symbol;
-  const price = dataOutputObj.price;
+  const price = (dataOutputObj.quote.price).toFixed(2);
 
   const subject = `~~ ${symbol} - ${actionToTake} - $${price}`;
   const textPart = `Trade Recommendation: ${actionToTake} ${symbol} at ${price}.`;
@@ -172,7 +172,7 @@ const processAsset = async (asset) => {
     // federal_tax_rate: FEDERAL_TAX_RATE,
     entry_transaction_cost: calculateTransactionCost(asset.entry, asset.shares, 'taker'),
     sell_now: calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker'),
-    sell_at_limit: calculateTradeProfit(asset.entry, asset.sell_limit, asset.shares, 'taker'),
+    sell_at_limit: calculateTradeProfit(asset.entry, asset.sell_limit_1, asset.shares, 'taker'),
   } : null;
 
   const dummy_position =
@@ -201,18 +201,47 @@ const processAsset = async (asset) => {
   // log findings
   console.log(LOGGED_DATA_OBJ);
 
-  // trigger alerts
-  const SELL_SIGNAL = asset.shares > 0 && currentPrice >= asset.resistance;
+//
+  // trigger SELL alerts
+  //
+  let SELL_SIGNAL = false;
+  let sell_limit_level = '';
+  if (asset.shares > 0) {
+    if (currentPrice >= asset.sell_limit_3) {
+      sell_limit_level = 'limit_3'
+      SELL_SIGNAL = true;
+    } else if (currentPrice >= asset.sell_limit_2) {
+      sell_limit_level = 'limit_2'
+      SELL_SIGNAL = true;
+    } else if (currentPrice >= asset.sell_limit_1) {
+      sell_limit_level = 'limit_1'
+      SELL_SIGNAL = true;
+    } else {/* do nothing */}
+  }
 
-  const BUY_SIGNAL = asset.shares === 0 && currentPrice <= asset.support;
+  if (SELL_SIGNAL) {
+    sendEmailNotification(`sell - ${sell_limit_level}`, LOGGED_DATA_OBJ);
+  }
 
-  if (SELL_SIGNAL) sendTradeNotification('sell', LOGGED_DATA_OBJ);
-  if (BUY_SIGNAL) sendTradeNotification('buy', LOGGED_DATA_OBJ);
-
-  if (asset.alert_level > 0) {
-    if (currentPrice >= asset.alert_level) {
-      sendTradeNotification('alert', LOGGED_DATA_OBJ);
-    }
+  //
+  // trigger BUY alerts
+  //
+  let BUY_SIGNAL = false;
+  let buy_limit_level = '';
+  if (asset.shares === 0) {
+    if (currentPrice >= asset.buy_limit_3) {
+      buy_limit_level = 'limit_3'
+      BUY_SIGNAL = true;
+    } else if (currentPrice >= asset.buy_limit_2) {
+      buy_limit_level = 'limit_2'
+      BUY_SIGNAL = true;
+    } else if (currentPrice >= asset.buy_limit_1) {
+      buy_limit_level = 'limit_1'
+      BUY_SIGNAL = true;
+    } else {/* do nothing */}
+  }
+  if (BUY_SIGNAL) {
+    sendEmailNotification(`buy - ${buy_limit_level}`, LOGGED_DATA_OBJ);
   }
 };
 
