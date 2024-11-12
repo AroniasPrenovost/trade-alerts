@@ -160,8 +160,6 @@ function calculateTradeRangePercentage(num1, num2) {
 
 const processAsset = async (asset) => {
   const assetData = await getAndProcessAssetPriceData(asset.symbol);
-  console.log(JSON.stringify(assetData, null, 2));
-
   const currentPrice = assetData.quote.price;
 
   //
