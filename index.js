@@ -105,9 +105,7 @@ const getAndProcessAssetPriceData = async (symbol) => {
     delete data.quote.USD.tvl;
     delete data.quote.USD.fully_diluted_market_cap;
     delete data.num_market_pairs;
-
     data.quote = {...data.quote.USD};
-    // add unix timestamp
     data.date = Date.now();
     return data;
   }
