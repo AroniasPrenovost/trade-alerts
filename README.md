@@ -60,6 +60,8 @@ To run this application as a scheduled task using Google Cloud Functions, you ca
 
 **Build for Google Cloud Function:**
 
+This command modifies the `index.js` file to be copy+pasted for Google Cloud Functions
+
    ```bash
    node index build
    ```

@@ -1,5 +1,4 @@
-// REMOVE_DURING_BUILD
-// * this section and the above imports are replaced when this is built to be copy+pasted for Google Cloud Functions
+// REMOVED_DURING_BUILD
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
@@ -8,7 +7,7 @@ const Mailjet = require('node-mailjet');
 const configPath = path.join(__dirname, 'config.json');
 const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 const ASSET_LIST = config.assets;
-// REMOVE_DURING_BUILD
+// REMOVED_DURING_BUILD
 
 //
 // email notifications
@@ -204,7 +203,7 @@ const processAsset = async (asset) => {
   // log findings
   console.log(LOGGED_DATA_OBJ);
 
-//
+  //
   // trigger SELL alerts
   //
   let SELL_SIGNAL = false;
@@ -257,11 +256,11 @@ const main = async () => {
   const args = process.argv.slice(2);
   const symbolArg = args[0] ? args[0].toUpperCase() : args[0];
 
-  // REMOVE_DURING_BUILD
+  // REMOVED_DURING_BUILD
   if (symbolArg === 'BUILD') {
     generateIndexJsForGoogleCloudFunction();
   }
-  // REMOVE_DURING_BUILD
+  // REMOVED_DURING_BUILD
 
   if (symbolArg) {
     const asset = ASSET_LIST.find(asset => asset.symbol === symbolArg);
@@ -281,18 +280,18 @@ const main = async () => {
 
 main();
 
-// REMOVE_DURING_BUILD
+// REMOVED_DURING_BUILD
 function generateIndexJsForGoogleCloudFunction() {
   const sourceFilePath = __filename;
   const destinationFilePath = path.join(__dirname, 'gcf-index.js');
+  // get config.json asset list
   const configPath = path.join(__dirname, 'config.json');
   const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
   const ASSET_LIST = JSON.stringify(config.assets, null, 2);
-
+  // get index.js and remove certain code from the build
   const fileContent = fs.readFileSync(sourceFilePath, 'utf8');
-  // remove certain code from the build
   let modifiedContent = fileContent.replace(
-    /\/\/ REMOVE_DURING_BUILD[\s\S]*?\/\/ REMOVE_DURING_BUILD/,
+    /\/\/ REMOVED_DURING_BUILD[\s\S]*?\/\/ REMOVED_DURING_BUILD/,
     `
     //
     // copy + paste code below
@@ -300,11 +299,9 @@ function generateIndexJsForGoogleCloudFunction() {
 
     const ASSET_LIST = ${ASSET_LIST}`
   );
-
-  modifiedContent = modifiedContent.replace(/\/\/ REMOVE_DURING_BUILD[\s\S]*?\/\/ REMOVE_DURING_BUILD/, '');
-  modifiedContent = modifiedContent.replace(/\/\/ REMOVE_DURING_BUILD[\s\S]*?\/\/ REMOVE_DURING_BUILD/, '');
-
+  modifiedContent = modifiedContent.replace(/\/\/ REMOVED_DURING_BUILD[\s\S]*?\/\/ REMOVED_DURING_BUILD/, '');
+  modifiedContent = modifiedContent.replace(/\/\/ REMOVED_DURING_BUILD[\s\S]*?\/\/ REMOVED_DURING_BUILD/, '');
   // create new file
   fs.writeFileSync(destinationFilePath, modifiedContent, 'utf8');
 }
-// REMOVE_DURING_BUILD
+// REMOVED_DURING_BUILD
