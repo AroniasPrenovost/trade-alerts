@@ -204,16 +204,37 @@ const processAsset = async (asset) => {
   console.log(LOGGED_DATA_OBJ);
 
   //
+  // BUY alert triggers
+  //
+  let BUY_SIGNAL = false;
+  let buy_limit_level = '';
+  if (asset.shares === 0) {
+    if (currentPrice <= asset.buy_limit_3) {
+      buy_limit_level = 'limit_3 (lowest)'
+      BUY_SIGNAL = true;
+    } else if (currentPrice <= asset.buy_limit_2) {
+      buy_limit_level = 'limit_2 (lower)'
+      BUY_SIGNAL = true;
+    } else if (currentPrice <= asset.buy_limit_1) {
+      buy_limit_level = 'limit_1 (low)'
+      BUY_SIGNAL = true;
+    } else {/* do nothing */}
+  }
+  if (BUY_SIGNAL) {
+    sendEmailNotification(`buy - ${buy_limit_level}`, LOGGED_DATA_OBJ);
+  }
+
+  //
   // SELL alert triggers
   //
   let SELL_SIGNAL = false;
   let sell_limit_level = '';
   if (asset.shares > 0) {
     if (currentPrice >= asset.sell_limit_3) {
-      sell_limit_level = 'limit_3'
+      sell_limit_level = 'limit_3 (highest)'
       SELL_SIGNAL = true;
     } else if (currentPrice >= asset.sell_limit_2) {
-      sell_limit_level = 'limit_2'
+      sell_limit_level = 'limit_2 (higher)'
       SELL_SIGNAL = true;
     } else if (currentPrice >= asset.sell_limit_1) {
       sell_limit_level = 'limit_1'
@@ -223,27 +244,6 @@ const processAsset = async (asset) => {
 
   if (SELL_SIGNAL) {
     sendEmailNotification(`sell - ${sell_limit_level}`, LOGGED_DATA_OBJ);
-  }
-
-  //
-  // BUY alert triggers
-  //
-  let BUY_SIGNAL = false;
-  let buy_limit_level = '';
-  if (asset.shares === 0) {
-    if (currentPrice >= asset.buy_limit_3) {
-      buy_limit_level = 'limit_3'
-      BUY_SIGNAL = true;
-    } else if (currentPrice >= asset.buy_limit_2) {
-      buy_limit_level = 'limit_2'
-      BUY_SIGNAL = true;
-    } else if (currentPrice >= asset.buy_limit_1) {
-      buy_limit_level = 'limit_1'
-      BUY_SIGNAL = true;
-    } else {/* do nothing */}
-  }
-  if (BUY_SIGNAL) {
-    sendEmailNotification(`buy - ${buy_limit_level}`, LOGGED_DATA_OBJ);
   }
 };
 
