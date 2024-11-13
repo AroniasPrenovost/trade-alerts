@@ -292,12 +292,13 @@ main();
 function generateIndexJsForGoogleCloudFunction() {
   const sourceFilePath = __filename;
   const destinationFilePath = path.join(__dirname, 'gcf-index.js');
-  // get config.json asset list
+  // get asset data from config.json
   const configPath = path.join(__dirname, 'config.json');
   const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
   const ASSET_LIST = JSON.stringify(config.assets, null, 2);
-  // get index.js and remove certain code from the build
+  // copy contents of 'index.js'
   const fileContent = fs.readFileSync(sourceFilePath, 'utf8');
+  // insert config
   let modifiedContent = fileContent.replace(
     /\/\/ REMOVED_DURING_BUILD[\s\S]*?\/\/ REMOVED_DURING_BUILD/,
     `
@@ -307,9 +308,10 @@ function generateIndexJsForGoogleCloudFunction() {
 
     const ASSET_LIST = ${ASSET_LIST}`
   );
+  // remove unused code
   modifiedContent = modifiedContent.replace(/\/\/ REMOVED_DURING_BUILD[\s\S]*?\/\/ REMOVED_DURING_BUILD/, '');
   modifiedContent = modifiedContent.replace(/\/\/ REMOVED_DURING_BUILD[\s\S]*?\/\/ REMOVED_DURING_BUILD/, '');
-  // create new file
+  // write to new 'gcf-index.js' file
   fs.writeFileSync(destinationFilePath, modifiedContent, 'utf8');
 }
 // REMOVED_DURING_BUILD
