@@ -76,8 +76,7 @@ const fetchCurrentAssetData = async (symbol) => {
     });
     return response.data.data[symbol];
   } catch (error) {
-    console.error('Error fetching latest data:', error);
-    console.log('symbol: ', symbol);
+    console.error(`Error fetching latest data for ${symbol}:`, error);
     return null;
   }
 };
