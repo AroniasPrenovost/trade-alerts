@@ -203,7 +203,7 @@ const processAsset = async (asset) => {
   //
   // BUY alert triggers
   //
-  
+
   let BUY_SIGNAL = false;
   // limit indicators
   let buy_limit_level = '';
@@ -267,6 +267,7 @@ const main = async () => {
   // REMOVED_DURING_BUILD
   if (symbolArg === 'BUILD') {
     generateIndexJsForGoogleCloudFunction();
+    return;
   }
   // REMOVED_DURING_BUILD
 
@@ -313,5 +314,6 @@ function generateIndexJsForGoogleCloudFunction() {
   modifiedContent = modifiedContent.replace(/\/\/ REMOVED_DURING_BUILD[\s\S]*?\/\/ REMOVED_DURING_BUILD/, '');
   // write to new 'gcf-index.js' file
   fs.writeFileSync(destinationFilePath, modifiedContent, 'utf8');
+  console.log('Successfully generated gcf-index.js')
 }
 // REMOVED_DURING_BUILD
