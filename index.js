@@ -4,9 +4,12 @@ const path = require('path');
 const axios = require('axios');
 const Mailjet = require('node-mailjet');
 
-//
-// copy + paste below
-//
+// replace in build
+// * this section and the above imports are replaced when this is built to be copy+pasted for Google Cloud Functions
+const configPath = path.join(__dirname, 'config.json');
+const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+const ASSET_LIST = config.assets;
+// replace in build
 
 //
 // email
@@ -250,11 +253,6 @@ const processAsset = async (asset) => {
 //
 
 const main = async () => {
-  // replace in build
-  const configPath = path.join(__dirname, 'config.json');
-  const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-  const ASSET_LIST = config.assets;
-  // replace in build
 
   const args = process.argv.slice(2);
   const symbolArg = args[0] ? args[0].toUpperCase() : args[0];
@@ -292,9 +290,16 @@ function copyAndModifyFileForGoogleCloud() {
   const fileContent = fs.readFileSync(sourceFilePath, 'utf8');
   let modifiedContent = fileContent.replace(
     /\/\/ replace in build[\s\S]*?\/\/ replace in build/,
-    `const ASSET_LIST = ${ASSET_LIST}`
+    `
+    //
+    // copy + paste code below
+    //
+
+    const ASSET_LIST = ${ASSET_LIST}`
   );
 
+
+  // manually remove imports
   modifiedContent = modifiedContent.replace("require('dotenv').config();", "");
   modifiedContent = modifiedContent.replace("const fs = require('fs');", "");
   modifiedContent = modifiedContent.replace("const path = require('path');", "");
@@ -304,5 +309,3 @@ function copyAndModifyFileForGoogleCloud() {
 
   fs.writeFileSync(destinationFilePath, modifiedContent, 'utf8');
 }
-
-// SPLIT_HERE
