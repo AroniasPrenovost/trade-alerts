@@ -204,54 +204,48 @@ const processAsset = async (asset) => {
   // BUY alert triggers
   //
 
-  let BUY_SIGNAL = false;
-  // limit indicators
-  let buy_limit_level = '';
   if (asset.shares === 0) {
-    if (asset.buy_limit_3 > 0 && (currentPrice <= asset.buy_limit_3)) {
-      buy_limit_level = 'limit_3 (lowest low)'
-      BUY_SIGNAL = true;
-    } else if (asset.buy_limit_2 > 0 && (currentPrice <= asset.buy_limit_2)) {
-      buy_limit_level = 'limit_2 (medium low)'
-      BUY_SIGNAL = true;
-    } else if (asset.buy_limit_1 > 0 && (currentPrice <= asset.buy_limit_1)) {
-      buy_limit_level = 'limit_1 (highest low)'
-      BUY_SIGNAL = true;
-    } else {/* do nothing */}
-  }
-
-  // technical indicators
-  // todo...
-
-  if (BUY_SIGNAL) {
-    sendEmailNotification(`buy - ${buy_limit_level}`, LOGGED_DATA_OBJ);
+    // buy limit indicators
+    switch (true) {
+      case (asset.buy_limit_3 > 0 && currentPrice <= asset.buy_limit_3):
+        sendEmailNotification('buy_limit_3 (lowest low)', LOGGED_DATA_OBJ);
+        break;
+      case (asset.buy_limit_2 > 0 && currentPrice <= asset.buy_limit_2):
+        sendEmailNotification('buy_limit_2 (middle low)', LOGGED_DATA_OBJ);
+        break;
+      case (asset.buy_limit_1 > 0 && currentPrice <= asset.buy_limit_1):
+        sendEmailNotification('buy_limit_1 (highest high)', LOGGED_DATA_OBJ);
+        break;
+      default:
+        // do nothing
+        break;
+    }
+    // technical indicators
+    // todo...
   }
 
   //
   // SELL alert triggers
   //
 
-  let SELL_SIGNAL = false;
-  // limit indicators
-  let sell_limit_level = '';
   if (asset.shares > 0) {
-    if (asset.sell_limit_3 > 0 && (currentPrice >= asset.sell_limit_3)) {
-      sell_limit_level = 'limit_3 (highest high)'
-      SELL_SIGNAL = true;
-    } else if (asset.sell_limit_2 > 0 && (currentPrice >= asset.sell_limit_2)) {
-      sell_limit_level = 'limit_2 (medium high)'
-      SELL_SIGNAL = true;
-    } else if (asset.sell_limit_1 > 0 && (currentPrice >= asset.sell_limit_1)) {
-      sell_limit_level = 'limit_1 (lowest high)'
-      SELL_SIGNAL = true;
-    } else {/* do nothing */}
-  }
-
-  // technical indicators
-  // todo...
-
-  if (SELL_SIGNAL) {
-    sendEmailNotification(`sell - ${sell_limit_level}`, LOGGED_DATA_OBJ);
+    // sell limit indicators
+    switch (true) {
+      case (asset.sell_limit_3 > 0 && currentPrice >= asset.sell_limit_3):
+        sendEmailNotification('sell_limit_3 (highest high)', LOGGED_DATA_OBJ);
+        break;
+      case (asset.sell_limit_2 > 0 && currentPrice >= asset.sell_limit_2):
+        sendEmailNotification('sell_limit_2 (middle high)', LOGGED_DATA_OBJ);
+        break;
+      case (asset.sell_limit_1 > 0 && currentPrice >= asset.sell_limit_1):
+        sendEmailNotification('sell_limit_1 (lowest high)', LOGGED_DATA_OBJ);
+        break;
+      default:
+        // do nothing
+        break;
+    }
+    // technical indicators
+    // todo...
   }
 };
 
