@@ -294,7 +294,7 @@ function generateIndexJsForGoogleCloudFunction() {
     /\/\/ REMOVED_DURING_BUILD[\s\S]*?\/\/ REMOVED_DURING_BUILD/,
     `
     //
-    // copy + paste code below
+    // copy + paste
     //
 
     const ASSET_LIST = ${ASSET_LIST}`
