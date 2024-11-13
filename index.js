@@ -1,20 +1,18 @@
+// REMOVE_DURING_BUILD
+// * this section and the above imports are replaced when this is built to be copy+pasted for Google Cloud Functions
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const Mailjet = require('node-mailjet');
-
-// replace in build
-// * this section and the above imports are replaced when this is built to be copy+pasted for Google Cloud Functions
 const configPath = path.join(__dirname, 'config.json');
 const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 const ASSET_LIST = config.assets;
-// replace in build
+// REMOVE_DURING_BUILD
 
 //
-// email
+// email notifications
 //
-
 
 const mailjet = Mailjet.apiConnect(
   process.env.MAILJET_API_KEY,
@@ -175,7 +173,9 @@ const processAsset = async (asset) => {
     // federal_tax_rate: FEDERAL_TAX_RATE,
     entry_transaction_cost: calculateTransactionCost(asset.entry, asset.shares, 'taker'),
     sell_now: calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker'),
-    sell_at_limit: calculateTradeProfit(asset.entry, asset.sell_limit_1, asset.shares, 'taker'),
+    sell_at_limit_1: calculateTradeProfit(asset.entry, asset.sell_limit_1, asset.shares, 'taker'),
+    sell_at_limit_2: calculateTradeProfit(asset.entry, asset.sell_limit_2, asset.shares, 'taker'),
+    sell_at_limit_3: calculateTradeProfit(asset.entry, asset.sell_limit_3, asset.shares, 'taker'),
   } : null;
 
   const dummy_position =
@@ -257,9 +257,11 @@ const main = async () => {
   const args = process.argv.slice(2);
   const symbolArg = args[0] ? args[0].toUpperCase() : args[0];
 
+  // REMOVE_DURING_BUILD
   if (symbolArg === 'BUILD') {
-    copyAndModifyFileForGoogleCloud();
+    generateIndexJsForGoogleCloudFunction();
   }
+  // REMOVE_DURING_BUILD
 
   if (symbolArg) {
     const asset = ASSET_LIST.find(asset => asset.symbol === symbolArg);
@@ -279,8 +281,8 @@ const main = async () => {
 
 main();
 
-
-function copyAndModifyFileForGoogleCloud() {
+// REMOVE_DURING_BUILD
+function generateIndexJsForGoogleCloudFunction() {
   const sourceFilePath = __filename;
   const destinationFilePath = path.join(__dirname, 'gcf-index.js');
   const configPath = path.join(__dirname, 'config.json');
@@ -288,8 +290,9 @@ function copyAndModifyFileForGoogleCloud() {
   const ASSET_LIST = JSON.stringify(config.assets, null, 2);
 
   const fileContent = fs.readFileSync(sourceFilePath, 'utf8');
+  // remove certain code from the build
   let modifiedContent = fileContent.replace(
-    /\/\/ replace in build[\s\S]*?\/\/ replace in build/,
+    /\/\/ REMOVE_DURING_BUILD[\s\S]*?\/\/ REMOVE_DURING_BUILD/,
     `
     //
     // copy + paste code below
@@ -298,14 +301,10 @@ function copyAndModifyFileForGoogleCloud() {
     const ASSET_LIST = ${ASSET_LIST}`
   );
 
+  modifiedContent = modifiedContent.replace(/\/\/ REMOVE_DURING_BUILD[\s\S]*?\/\/ REMOVE_DURING_BUILD/, '');
+  modifiedContent = modifiedContent.replace(/\/\/ REMOVE_DURING_BUILD[\s\S]*?\/\/ REMOVE_DURING_BUILD/, '');
 
-  // manually remove imports
-  modifiedContent = modifiedContent.replace("require('dotenv').config();", "");
-  modifiedContent = modifiedContent.replace("const fs = require('fs');", "");
-  modifiedContent = modifiedContent.replace("const path = require('path');", "");
-  modifiedContent = modifiedContent.replace("const axios = require('axios');", "");
-  modifiedContent = modifiedContent.replace("const Mailjet = require('node-mailjet');", "");
-  // modifiedContent = modifiedContent.split("// SPLIT_HERE")[0];
-
+  // create new file
   fs.writeFileSync(destinationFilePath, modifiedContent, 'utf8');
 }
+// REMOVE_DURING_BUILD
