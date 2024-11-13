@@ -204,7 +204,7 @@ const processAsset = async (asset) => {
   console.log(LOGGED_DATA_OBJ);
 
   //
-  // trigger SELL alerts
+  // SELL alert triggers
   //
   let SELL_SIGNAL = false;
   let sell_limit_level = '';
@@ -226,7 +226,7 @@ const processAsset = async (asset) => {
   }
 
   //
-  // trigger BUY alerts
+  // BUY alert triggers
   //
   let BUY_SIGNAL = false;
   let buy_limit_level = '';
