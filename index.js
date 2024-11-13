@@ -208,13 +208,13 @@ const processAsset = async (asset) => {
   // limit indicators
   let buy_limit_level = '';
   if (asset.shares === 0) {
-    if (currentPrice <= asset.buy_limit_3) {
+    if (asset.buy_limit_3 > 0 && (currentPrice <= asset.buy_limit_3)) {
       buy_limit_level = 'limit_3 (lowest low)'
       BUY_SIGNAL = true;
-    } else if (currentPrice <= asset.buy_limit_2) {
+    } else if (asset.buy_limit_2 > 0 && (currentPrice <= asset.buy_limit_2)) {
       buy_limit_level = 'limit_2 (medium low)'
       BUY_SIGNAL = true;
-    } else if (currentPrice <= asset.buy_limit_1) {
+    } else if (asset.buy_limit_1 > 0 && (currentPrice <= asset.buy_limit_1)) {
       buy_limit_level = 'limit_1 (highest low)'
       BUY_SIGNAL = true;
     } else {/* do nothing */}
@@ -235,13 +235,13 @@ const processAsset = async (asset) => {
   // limit indicators
   let sell_limit_level = '';
   if (asset.shares > 0) {
-    if (currentPrice >= asset.sell_limit_3) {
+    if (asset.sell_limit_3 > 0 && (currentPrice >= asset.sell_limit_3)) {
       sell_limit_level = 'limit_3 (highest high)'
       SELL_SIGNAL = true;
-    } else if (currentPrice >= asset.sell_limit_2) {
+    } else if (asset.sell_limit_2 > 0 && (currentPrice >= asset.sell_limit_2)) {
       sell_limit_level = 'limit_2 (medium high)'
       SELL_SIGNAL = true;
-    } else if (currentPrice >= asset.sell_limit_1) {
+    } else if (asset.sell_limit_1 > 0 && (currentPrice >= asset.sell_limit_1)) {
       sell_limit_level = 'limit_1 (lowest high)'
       SELL_SIGNAL = true;
     } else {/* do nothing */}
