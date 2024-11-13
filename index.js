@@ -203,8 +203,8 @@ const processAsset = async (asset) => {
   //
   // BUY alert triggers
   //
+  
   let BUY_SIGNAL = false;
-
   // limit indicators
   let buy_limit_level = '';
   if (asset.shares === 0) {
@@ -230,8 +230,8 @@ const processAsset = async (asset) => {
   //
   // SELL alert triggers
   //
-  let SELL_SIGNAL = false;
 
+  let SELL_SIGNAL = false;
   // limit indicators
   let sell_limit_level = '';
   if (asset.shares > 0) {
