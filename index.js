@@ -1,4 +1,4 @@
-// REMOVED_DURING_BUILD
+// WRAPPED_CODE_REMOVED_WHEN_BUILT
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
@@ -7,7 +7,7 @@ const Mailjet = require('node-mailjet');
 const configPath = path.join(__dirname, 'config.json');
 const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 const ASSET_LIST = config.assets;
-// REMOVED_DURING_BUILD
+// WRAPPED_CODE_REMOVED_WHEN_BUILT
 
 //
 // email notifications
@@ -201,6 +201,20 @@ const processAsset = async (asset) => {
   console.log(LOGGED_DATA_OBJ);
 
   //
+  // support + resistance alerts
+  //
+  /*
+      If the price falls below a support level, that level will become resistance.
+      If the price rises above a resistance level, it will often become support.
+      As the price moves past a level of support or resistance,
+      it is thought that supply and demand has shifted, causing the breached level to reverse its role.
+  */
+
+  if (currentPrice === asset.support) sendEmailNotification('price hit support level', LOGGED_DATA_OBJ);
+  if (currentPrice < asset.support) sendEmailNotification('price dropped BELOW support level', LOGGED_DATA_OBJ);
+  if (currentPrice >= asset.resistance) sendEmailNotification('price hit or broke above resistance)', LOGGED_DATA_OBJ);
+
+  //
   // BUY alert triggers
   //
 
@@ -264,12 +278,12 @@ const main = async () => {
   const args = process.argv.slice(2);
   const symbolArg = args[0] ? args[0].toUpperCase() : args[0];
 
-  // REMOVED_DURING_BUILD
+  // WRAPPED_CODE_REMOVED_WHEN_BUILT
   if (symbolArg === 'BUILD') {
     generateIndexJsForGoogleCloudFunction();
     return;
   }
-  // REMOVED_DURING_BUILD
+  // WRAPPED_CODE_REMOVED_WHEN_BUILT
 
   if (symbolArg) {
     const asset = ASSET_LIST.find(asset => asset.symbol === symbolArg);
@@ -289,7 +303,7 @@ const main = async () => {
 
 main();
 
-// REMOVED_DURING_BUILD
+// WRAPPED_CODE_REMOVED_WHEN_BUILT
 function generateIndexJsForGoogleCloudFunction() {
   const sourceFilePath = __filename;
   const destinationFilePath = path.join(__dirname, 'gcf-index.js');
@@ -301,7 +315,7 @@ function generateIndexJsForGoogleCloudFunction() {
   const fileContent = fs.readFileSync(sourceFilePath, 'utf8');
   // insert config
   let modifiedContent = fileContent.replace(
-    /\/\/ REMOVED_DURING_BUILD[\s\S]*?\/\/ REMOVED_DURING_BUILD/,
+    /\/\/ WRAPPED_CODE_REMOVED_WHEN_BUILT[\s\S]*?\/\/ WRAPPED_CODE_REMOVED_WHEN_BUILT/,
     `
     //
     // copy + paste below
@@ -310,10 +324,10 @@ function generateIndexJsForGoogleCloudFunction() {
     const ASSET_LIST = ${ASSET_LIST}`
   );
   // remove unused code
-  modifiedContent = modifiedContent.replace(/\/\/ REMOVED_DURING_BUILD[\s\S]*?\/\/ REMOVED_DURING_BUILD/, '');
-  modifiedContent = modifiedContent.replace(/\/\/ REMOVED_DURING_BUILD[\s\S]*?\/\/ REMOVED_DURING_BUILD/, '');
+  modifiedContent = modifiedContent.replace(/\/\/ WRAPPED_CODE_REMOVED_WHEN_BUILT[\s\S]*?\/\/ WRAPPED_CODE_REMOVED_WHEN_BUILT/, '');
+  modifiedContent = modifiedContent.replace(/\/\/ WRAPPED_CODE_REMOVED_WHEN_BUILT[\s\S]*?\/\/ WRAPPED_CODE_REMOVED_WHEN_BUILT/, '');
   // write to new 'gcf-index.js' file
   fs.writeFileSync(destinationFilePath, modifiedContent, 'utf8');
   console.log('Successfully generated gcf-index.js')
 }
-// REMOVED_DURING_BUILD
+// WRAPPED_CODE_REMOVED_WHEN_BUILT
