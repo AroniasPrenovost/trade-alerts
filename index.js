@@ -207,6 +207,9 @@ const processAsset = async (asset) => {
   if (asset.shares === 0) {
     // buy limit indicators
     switch (true) {
+      case asset.support >= currentPrice:
+        sendEmailNotification('current price lower than support price', LOGGED_DATA_OBJ);
+        break;
       case (asset.buy_limit_3 > 0 && currentPrice <= asset.buy_limit_3):
         sendEmailNotification('buy_limit_3 (lowest low)', LOGGED_DATA_OBJ);
         break;
@@ -231,6 +234,9 @@ const processAsset = async (asset) => {
   if (asset.shares > 0) {
     // sell limit indicators
     switch (true) {
+      case asset.resistance <= currentPrice:
+        sendEmailNotification('current price higher than resistance', LOGGED_DATA_OBJ);
+        break;
       case (asset.sell_limit_3 > 0 && currentPrice >= asset.sell_limit_3):
         sendEmailNotification('sell_limit_3 (highest high)', LOGGED_DATA_OBJ);
         break;
