@@ -313,20 +313,15 @@ function generateIndexJsForGoogleCloudFunction() {
   const ASSET_LIST = JSON.stringify(config.assets, null, 2);
   // copy contents of 'index.js'
   const fileContent = fs.readFileSync(sourceFilePath, 'utf8');
-  // insert config
+  // insert config into FIRST instance of these comments
   let modifiedContent = fileContent.replace(
     /\/\/ WRAPPED_CODE_REMOVED_WHEN_BUILT[\s\S]*?\/\/ WRAPPED_CODE_REMOVED_WHEN_BUILT/,
-    `
-    //
-    // copy + paste below
-    //
-
-    const ASSET_LIST = ${ASSET_LIST}`
+    `const ASSET_LIST = ${ASSET_LIST}`
   );
-  // remove unused code
+  // remove unused code in laster instances of the comments
   modifiedContent = modifiedContent.replace(/\/\/ WRAPPED_CODE_REMOVED_WHEN_BUILT[\s\S]*?\/\/ WRAPPED_CODE_REMOVED_WHEN_BUILT/, '');
   modifiedContent = modifiedContent.replace(/\/\/ WRAPPED_CODE_REMOVED_WHEN_BUILT[\s\S]*?\/\/ WRAPPED_CODE_REMOVED_WHEN_BUILT/, '');
-  // write to new 'gcf-index.js' file
+  // write to 'gcf-index.js' file
   fs.writeFileSync(destinationFilePath, modifiedContent, 'utf8');
   console.log('Successfully generated gcf-index.js')
 }
