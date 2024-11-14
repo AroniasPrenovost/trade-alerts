@@ -12,10 +12,7 @@
           "buy_limit_1": 0,
           "sell_limit_1": 37,
           "sell_limit_2": 39.5,
-          "sell_limit_3": 0,
-          "__dummy_entry": 30,
-          "__dummy_shares": 5,
-          "__dummy_sell_limit": 35
+          "sell_limit_3": 0
       },
       {
           "enabled": false,
@@ -29,10 +26,7 @@
           "buy_limit_1": 0,
           "sell_limit_1": 4.6,
           "sell_limit_2": 0,
-          "sell_limit_3": 0,
-          "__dummy_entry": 4.1,
-          "__dummy_shares": 100,
-          "__dummy_sell_limit": 4.50
+          "sell_limit_3": 0
       },
       {
           "enabled": false,
@@ -46,10 +40,7 @@
           "buy_limit_1": 0,
           "sell_limit_1": 10.25,
           "sell_limit_2": 11.1,
-          "sell_limit_3": 0,
-          "__dummy_entry": 8.718,
-          "__dummy_shares": 9.9,
-          "__dummy_sell_limit": 9.9
+          "sell_limit_3": 0
       },
       {
           "enabled": true,
@@ -63,10 +54,7 @@
            "buy_limit_1": 0,
            "sell_limit_1": 0.35,
            "sell_limit_2": 0.45,
-           "sell_limit_3": 0,
-           "__dummy_entry": 0.1221,
-           "__dummy_shares": 800,
-           "__dummy_sell_limit": 0.15
+           "sell_limit_3": 0
        },
       {
           "enabled": true,
@@ -80,10 +68,7 @@
           "buy_limit_1": 0,
           "sell_limit_1": 0.64,
           "sell_limit_2": 0.67,
-          "sell_limit_3": 0,
-          "__dummy_entry": 0.59,
-          "__dummy_shares": 100.16807396,
-          "__dummy_sell_limit": 0.67
+          "sell_limit_3": 0
       }
     ]
 }

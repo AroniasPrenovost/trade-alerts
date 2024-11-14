@@ -169,32 +169,17 @@ const processAsset = async (asset) => {
     // federal_tax_rate: FEDERAL_TAX_RATE,
     entry_transaction_cost: calculateTransactionCost(asset.entry, asset.shares, 'taker'),
     sell_now: calculateTradeProfit(asset.entry, currentPrice, asset.shares, 'taker'),
-    sell_at_limit_1: calculateTradeProfit(asset.entry, asset.sell_limit_1, asset.shares, 'taker'),
-    sell_at_limit_2: calculateTradeProfit(asset.entry, asset.sell_limit_2, asset.shares, 'taker'),
-    sell_at_limit_3: calculateTradeProfit(asset.entry, asset.sell_limit_3, asset.shares, 'taker'),
-  } : null;
-
-  const dummy_position =
-    asset.__dummy_shares !== 0 && asset.__dummy_entry !== 0
-    ?
-    {
-      entry_price: asset.__dummy_entry,
-      shares: asset.__dummy_shares,
-      federal_tax_rate: FEDERAL_TAX_RATE,
-      entry_transaction_cost: calculateTransactionCost(asset.__dummy_entry, asset.__dummy_shares, 'taker'),
-      sell_now: calculateTradeProfit(asset.__dummy_entry, currentPrice, asset.__dummy_shares, 'taker'),
-      sell_at_limit: calculateTradeProfit(asset.__dummy_entry, asset.__dummy_sell_limit, asset.__dummy_shares, 'taker'),
+    sell_at_limit_1: asset.sell_limit_1 > 0 ? calculateTradeProfit(asset.entry, asset.sell_limit_1, asset.shares, 'taker') : null,
+    sell_at_limit_2: asset.sell_limit_2 > 0 ? calculateTradeProfit(asset.entry, asset.sell_limit_2, asset.shares, 'taker'): null,
+    sell_at_limit_3: asset.sell_limit_3 > 0 ? calculateTradeProfit(asset.entry, asset.sell_limit_3, asset.shares, 'taker'): null,
   } : null;
 
   const LOGGED_DATA_OBJ = {
-    // symbol: asset.symbol,
-    // price: currentPrice,
     ...assetData,
     support: asset.support,
     resistance: asset.resistance,
     trade_range_percentage: calculateTradeRangePercentage(asset.support, asset.resistance),
     position,
-    dummy_position,
   };
 
   // log findings
