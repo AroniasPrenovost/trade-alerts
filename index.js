@@ -55,16 +55,47 @@ const sendEmailNotification = (action, dataOutputObj) => {
 };
 
 //
-// data processing utils
+// tax and exchange fees
 //
 
 const FEDERAL_TAX_RATE = Number(process.env.FEDERAL_TAX_RATE);
-const SPOT_MAKER_FEE = Number(process.env.SPOT_MAKER_FEE);
-const SPOT_TAKER_FEE = Number(process.env.SPOT_TAKER_FEE);
+
+const COINBASE_SPOT_MAKER_FEE = Number(process.env.COINBASE_SPOT_MAKER_FEE);
+const COINBASE_SPOT_TAKER_FEE = Number(process.env.COINBASE_SPOT_TAKER_FEE);
+
+//
+// alphavantage API (stocks)
+//
+
+const ALPHAVANTAGE_API_KEY = process.env.ALPHAVANTAGE_API_KEY;
+
+const fetchStockData = async (symbol) => {
+  const ALPHAVANTAGE_API_URL = 'https://www.alphavantage.co/query';
+  try {
+    const response = await axios.get(ALPHAVANTAGE_API_URL, {
+      params: {
+        function: 'TIME_SERIES_INTRADAY',
+        symbol: symbol,
+        interval: '5min',
+        apikey: ALPHAVANTAGE_API_KEY,
+      },
+    });
+    console.log('IBM Stock Data:', response.data);
+  } catch (error) {
+    console.error('Error fetching IBM stock data:', error);
+  }
+};
+
+// Call the function to fetch IBM stock data
+// fetchStockData('IBM');
+
+//
+// coinmarketcap API (cryptos)
+//
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
 
-const fetchCurrentAssetData = async (symbol) => {
+const fetchCryptoData = async (symbol) => {
   const LATEST_PRICE_API_URL = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest';
   try {
     const response = await axios.get(LATEST_PRICE_API_URL, {
@@ -82,7 +113,7 @@ const fetchCurrentAssetData = async (symbol) => {
 };
 
 const getAndProcessAssetPriceData = async (symbol) => {
-  const data = await fetchCurrentAssetData(symbol);
+  const data = await fetchCryptoData(symbol);
   if (data !== null) {
     delete data.id;
     delete data.name;
@@ -112,7 +143,7 @@ const getAndProcessAssetPriceData = async (symbol) => {
 };
 
 function calculateExchangeFee(price, numberOfShares, feeType) {
-  const feeRate = (feeType.toLowerCase() === 'maker') ? SPOT_MAKER_FEE : SPOT_TAKER_FEE;
+  const feeRate = (feeType.toLowerCase() === 'maker') ? COINBASE_SPOT_MAKER_FEE : COINBASE_SPOT_TAKER_FEE;
   const fee = (feeRate / 100) * price * numberOfShares;
   return fee;
 }
