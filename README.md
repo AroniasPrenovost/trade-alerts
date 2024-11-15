@@ -68,7 +68,7 @@ This command copies the contents of `index.js` and modifies them to be copy+past
 
 ## Philosophy
 
-`Process` > `Outcome` mindset. Follow a specific system and be patient to avoid negative trading psychology practices.
+For success, it is imperative to follow and continually manifest a `Process` > `Outcome` mindset. That means you follow a specific system and be patient to avoid negative trading psychology practices (overtrading, FOMO, etc.).
 1. Check/set support and resistance levels weekly (Sunday evening)
 - avoid trading more than 2-3 instruments. Spreading out positions leads to longer wait times and lower gains.
 2. Patiently wait for alerts, and adjust `support` and `resistance` as ranges change.
