@@ -66,6 +66,14 @@ This command modifies the `index.js` file to be copy+pasted for Google Cloud Fun
    node index build
    ```
 
+## Philosophy
+
+`Process` > `Outcome` mindset. Follow a specific system and be patient to avoid negative trading psychology practices.
+1. Check/set support and resistance levels weekly (Sunday evening)
+  - avoid trading more than 2-3 instruments. Spreading out positions leads to longer wait times, lower gains 
+2. Patiently wait for alerts, expect to adjust `support` and `resistance` as ranges change.
+3. Take profits often.
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
