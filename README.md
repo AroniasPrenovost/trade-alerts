@@ -1,6 +1,6 @@
 # Crypto Price Alert System
 
-This project is a Node.js application that monitors cryptocurrency prices using the CoinMarketCap API and sends trade notifications via email using Mailjet. The application checks the current price of specified cryptocurrencies and sends an alert if the price crosses predefined high or low thresholds.
+Node.js application that monitors cryptocurrency prices using the CoinMarketCap API and sends trade setup notifications via email using Mailjet.
 
 ## Features
 
