@@ -64,32 +64,6 @@ const COINBASE_SPOT_MAKER_FEE = Number(process.env.COINBASE_SPOT_MAKER_FEE);
 const COINBASE_SPOT_TAKER_FEE = Number(process.env.COINBASE_SPOT_TAKER_FEE);
 
 //
-// alphavantage API (stocks)
-//
-
-const ALPHAVANTAGE_API_KEY = process.env.ALPHAVANTAGE_API_KEY;
-
-const fetchStockData = async (symbol) => {
-  const ALPHAVANTAGE_API_URL = 'https://www.alphavantage.co/query';
-  try {
-    const response = await axios.get(ALPHAVANTAGE_API_URL, {
-      params: {
-        function: 'TIME_SERIES_INTRADAY',
-        symbol: symbol,
-        interval: '5min',
-        apikey: ALPHAVANTAGE_API_KEY,
-      },
-    });
-    console.log('IBM Stock Data:', response.data);
-  } catch (error) {
-    console.error('Error fetching IBM stock data:', error);
-  }
-};
-
-// Call the function to fetch IBM stock data
-// fetchStockData('IBM');
-
-//
 // coinmarketcap API (cryptos)
 //
 
@@ -112,8 +86,8 @@ const fetchCryptoData = async (symbol) => {
   }
 };
 
-const getAndProcessAssetPriceData = async (symbol) => {
-  const data = await fetchCryptoData(symbol);
+const getAndProcessCryptoData = async (symbol) => {
+  const data = await fetchCryptoData(symbol)
   if (data !== null) {
     delete data.id;
     delete data.name;
@@ -187,7 +161,7 @@ function calculateTradeRangePercentage(num1, num2) {
 //
 
 const processAsset = async (asset) => {
-  const assetData = await getAndProcessAssetPriceData(asset.symbol);
+  const assetData = await getAndProcessCryptoData(asset.symbol);
   const currentPrice = assetData.quote.price;
 
   //
